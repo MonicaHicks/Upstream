@@ -42,9 +42,17 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
 
   const markChallengeSolved = (roomId: string) => {
     if (!currentPlayer) return;
+
+    // Check if any player already solved it
+    const alreadySolved = players.some((p) =>
+      p.challengesSolved.includes(roomId)
+    );
+    if (alreadySolved) return;
+
+    // Give credit to the current player
     setPlayers((prev) =>
       prev.map((p) =>
-        p.id === currentPlayer.id && !p.challengesSolved.includes(roomId)
+        p.id === currentPlayer.id
           ? { ...p, challengesSolved: [...p.challengesSolved, roomId] }
           : p
       )
