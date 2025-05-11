@@ -1,8 +1,15 @@
-// app/room/[roomId].tsx
-
 import { useGame } from "@/context/GameContext";
+import { roomRiddlesWithAnswers } from "@/data/roomRiddlesWithAnswers";
+import { checkAnswer } from "@/utils/checkAnswer";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function RoomScreen() {
   const { roomId } = useLocalSearchParams<{ roomId: string }>();
@@ -11,8 +18,16 @@ export default function RoomScreen() {
   const router = useRouter();
 
   const room = rooms.find((r) => r.id === roomId);
+  const riddles =
+    roomId &&
+    roomRiddlesWithAnswers[roomId as keyof typeof roomRiddlesWithAnswers];
+  const riddle = riddles?.[0] as { question: string; answer: string };
 
-  if (!room || !currentPlayer) {
+  const [input, setInput] = useState("");
+  const [solved, setSolved] = useState(false);
+  const [feedback, setFeedback] = useState("");
+
+  if (!room || !currentPlayer || !riddle) {
     return (
       <View style={styles.center}>
         <Text>Something went fishy 🐡</Text>
@@ -20,70 +35,68 @@ export default function RoomScreen() {
     );
   }
 
-  const handleSolve = () => {
-    markRoomVisited(room.id);
-    markChallengeSolved(room.id);
-    router.back();
+  const handleSubmit = () => {
+    const correct = checkAnswer(input, riddle.answer);
+    if (correct) {
+      markRoomVisited(room.id);
+      markChallengeSolved(room.id);
+      setSolved(true);
+      setFeedback("✅ Correct!");
+    } else {
+      setFeedback("❌ Try again.");
+    }
   };
 
   return (
     <View style={[styles.container, { backgroundColor: room.color }]}>
       <Text style={styles.header}>{room.name}</Text>
       <Text style={styles.subtext}>
-        Solved by:{" "}
+        Solving as:{" "}
         <Text style={{ fontWeight: "bold" }}>{currentPlayer.name}</Text>
       </Text>
 
-      <View style={styles.puzzleBox}>
-        <Text style={styles.puzzleText}>🧩 [Insert puzzle or riddle here]</Text>
+      <View style={styles.riddleBox}>
+        <Text style={styles.riddleText}>{riddle.question}</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your answer..."
+          value={input}
+          onChangeText={setInput}
+          editable={!solved}
+        />
+        <TouchableOpacity
+          onPress={handleSubmit}
+          style={styles.button}
+          disabled={solved}
+        >
+          <Text style={styles.buttonText}>Submit</Text>
+        </TouchableOpacity>
+        {feedback !== "" && <Text style={styles.feedback}>{feedback}</Text>}
       </View>
-
-      <TouchableOpacity onPress={handleSolve} style={styles.solveButton}>
-        <Text style={styles.solveText}>Mark Puzzle as Solved</Text>
-      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-    justifyContent: "center",
-  },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  header: {
-    fontSize: 32,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  subtext: {
-    textAlign: "center",
-    marginBottom: 32,
-    fontSize: 16,
-  },
-  puzzleBox: {
-    backgroundColor: "white",
+  container: { flex: 1, padding: 24, justifyContent: "center" },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  header: { fontSize: 32, fontWeight: "bold", textAlign: "center" },
+  subtext: { textAlign: "center", marginBottom: 24 },
+  riddleBox: {
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 20,
-    marginBottom: 24,
+    elevation: 2,
   },
-  puzzleText: {
-    fontSize: 18,
-    textAlign: "center",
+  riddleText: { fontSize: 18, marginBottom: 16 },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 12,
   },
-  solveButton: {
-    backgroundColor: "#222",
-    padding: 14,
-    borderRadius: 10,
-  },
-  solveText: {
-    color: "white",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
+  button: { backgroundColor: "#222", padding: 12, borderRadius: 8 },
+  buttonText: { color: "white", textAlign: "center", fontWeight: "bold" },
+  feedback: { marginTop: 12, fontSize: 16, textAlign: "center" },
 });
