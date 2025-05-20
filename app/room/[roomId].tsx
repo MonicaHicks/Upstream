@@ -1,9 +1,12 @@
+import BakeryGame from "@/components/BakeryGame";
+import GamblingGame from "@/components/GamblingGame";
 import { useGame } from "@/context/GameContext";
 import { roomRiddlesWithAnswers } from "@/data/roomRiddlesWithAnswers";
 import { checkAnswer } from "@/utils/checkAnswer";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  ImageBackground,
   StyleSheet,
   Text,
   TextInput,
@@ -27,7 +30,7 @@ export default function RoomScreen() {
   const [solved, setSolved] = useState(false);
   const [feedback, setFeedback] = useState("");
 
-  if (!room || !currentPlayer || !riddle) {
+  if (!room || !currentPlayer) {
     return (
       <View style={styles.center}>
         <Text>Something went fishy 🐡</Text>
@@ -36,7 +39,7 @@ export default function RoomScreen() {
   }
 
   const handleSubmit = () => {
-    const correct = checkAnswer(input, riddle.answer);
+    const correct = riddle && checkAnswer(input, riddle.answer);
     if (correct) {
       markRoomVisited(room.id);
       markChallengeSolved(room.id);
@@ -47,41 +50,101 @@ export default function RoomScreen() {
     }
   };
 
-  return (
-    <View style={[styles.container, { backgroundColor: room.color }]}>
-      <Text style={styles.header}>{room.name}</Text>
-      <Text style={styles.subtext}>
-        Solving as:{" "}
-        <Text style={{ fontWeight: "bold" }}>{currentPlayer.name}</Text>
-      </Text>
+  const handleGamblingWin = () => {
+    markRoomVisited(room.id);
+    markChallengeSolved(room.id);
+    setSolved(true);
+    setFeedback("Gambling Ace!");
+  };
 
-      <View style={styles.riddleBox}>
-        <Text style={styles.riddleText}>{riddle.question}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your answer..."
-          value={input}
-          onChangeText={setInput}
-          editable={!solved}
-        />
-        <TouchableOpacity
-          onPress={handleSubmit}
-          style={styles.button}
-          disabled={solved}
-        >
-          <Text style={styles.buttonText}>Submit</Text>
-        </TouchableOpacity>
-        {feedback !== "" && <Text style={styles.feedback}>{feedback}</Text>}
+  const handleBakeryWin = () => {
+    markRoomVisited(room.id);
+    markChallengeSolved(room.id);
+    setSolved(true);
+    setFeedback("Pro Baker!");
+  };
+
+  return (
+    <ImageBackground
+      source={room.image}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <View style={styles.overlay}>
+        <Text style={styles.header}>{room.name}</Text>
+        <Text style={styles.subtext}>
+          Solving as:{" "}
+          <Text style={{ fontWeight: "bold" }}>{currentPlayer.name}</Text>
+        </Text>
+
+        <View style={styles.riddleBox}>
+          {room.id === "gambling-den" ? (
+            <>
+              <GamblingGame onWin={handleGamblingWin} />
+              {feedback !== "" && (
+                <Text style={styles.feedback}>{feedback}</Text>
+              )}
+            </>
+          ) : room.id === "bakery" ? (
+            <>
+              <BakeryGame onWin={handleBakeryWin} />
+              {feedback !== "" && (
+                <Text style={styles.feedback}>{feedback}</Text>
+              )}
+            </>
+          ) : riddle ? (
+            <>
+              <Text style={styles.riddleText}>{riddle.question}</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your answer..."
+                value={input}
+                onChangeText={setInput}
+                editable={!solved}
+              />
+              <TouchableOpacity
+                onPress={handleSubmit}
+                style={styles.button}
+                disabled={solved}
+              >
+                <Text style={styles.buttonText}>Submit</Text>
+              </TouchableOpacity>
+              {feedback !== "" && (
+                <Text style={styles.feedback}>{feedback}</Text>
+              )}
+            </>
+          ) : (
+            <Text>No puzzle found for this room.</Text>
+          )}
+
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={[styles.button, { marginTop: 12, backgroundColor: "#888" }]}
+          >
+            <Text style={styles.buttonText}>Back to Map</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 24, justifyContent: "center" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  header: { fontSize: 32, fontWeight: "bold", textAlign: "center" },
-  subtext: { textAlign: "center", marginBottom: 24 },
+  header: {
+    fontSize: 42,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "white",
+    marginTop: 100,
+  },
+  subtext: {
+    fontSize: 30,
+    textAlign: "center",
+    marginBottom: 24,
+    color: "white",
+  },
   riddleBox: {
     backgroundColor: "#fff",
     borderRadius: 12,
@@ -99,4 +162,15 @@ const styles = StyleSheet.create({
   button: { backgroundColor: "#222", padding: 12, borderRadius: 8 },
   buttonText: { color: "white", textAlign: "center", fontWeight: "bold" },
   feedback: { marginTop: 12, fontSize: 16, textAlign: "center" },
+  background: {
+    flex: 1,
+    justifyContent: "center",
+  },
+
+  overlay: {
+    flex: 1,
+    padding: 24,
+    paddingTop: 60,
+    backgroundColor: "rgba(0,0,0,0.4)", // dim background slightly for readability
+  },
 });

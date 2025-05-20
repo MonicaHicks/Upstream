@@ -6,6 +6,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   FlatList,
+  Image,
   Modal,
   StyleSheet,
   Text,
@@ -33,20 +34,18 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>🏬 Explore the Market</Text>
+      <Text style={styles.header}>Upstream</Text>
       <FlatList
         data={rooms}
         numColumns={2}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={[
-              styles.roomCard,
-              { backgroundColor: item.color, opacity: item.unlocked ? 1 : 0.4 },
-            ]}
+            style={[styles.roomCard, { opacity: item.unlocked ? 1 : 0.4 }]}
             onPress={() => handleRoomPress(item)}
             disabled={!item.unlocked}
           >
+            <Image source={item.image} style={styles.roomImage} />
             <Text style={styles.roomText}>{item.name}</Text>
           </TouchableOpacity>
         )}
@@ -80,25 +79,38 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     paddingTop: 60,
-    backgroundColor: "#fff",
+    backgroundColor: "#174873",
   },
   header: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: "bold",
-    marginBottom: 16,
+    marginBottom: 24,
     textAlign: "center",
+    color: "white",
   },
   roomCard: {
     flex: 1,
     margin: 8,
-    padding: 24,
-    borderRadius: 12,
+    height: 150,
+    borderRadius: 16,
+    overflow: "hidden",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-end",
+  },
+  roomImage: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 16,
+    opacity: 0.8,
+    resizeMode: "cover",
   },
   roomText: {
     fontWeight: "bold",
     fontSize: 18,
+    color: "white",
+    backgroundColor: "rgba(0,0,0,0.4)",
+    width: "100%",
+    textAlign: "center",
+    paddingVertical: 8,
   },
   modalOverlay: {
     flex: 1,

@@ -1,52 +1,12 @@
 export const roomRiddlesWithAnswers = {
-  "tarot-card": [
+  tarot: [
     {
       question:
         "I speak without a mouth and hear without ears. I have no body, but I come alive with insight. What am I?",
       answer: "a vision",
     },
-    {
-      question:
-        "I show your past, present, and future, yet I\u2019m not time. What am I?",
-      answer: "tarot card",
-    },
-    {
-      question:
-        "A deck with no numbers, yet full of fate. Shuffle me, and you seal your date. What am I?",
-      answer: "tarot deck",
-    },
-    {
-      question:
-        "I may be a fool, or death in disguise. In the right hands, I open your eyes. What am I?",
-      answer: "tarot",
-    },
-    {
-      question:
-        "I reveal what\u2019s hidden and speak in signs, each card a message across the lines. What am I?",
-      answer: "divination",
-    },
   ],
-  "fish-market-stall": [
-    {
-      question:
-        "I swim in the sea and lay on ice. I\u2019m sold by the pound and sometimes by slice. What am I?",
-      answer: "fish",
-    },
-    {
-      question:
-        "My claws can pinch, my shell is red, I\u2019m tasty steamed or butter-fed. What am I?",
-      answer: "lobster",
-    },
-    {
-      question:
-        "I have tentacles, no bones at all. I might squirt ink if I feel small. What am I?",
-      answer: "squid",
-    },
-    {
-      question:
-        "I\u2019m shelled and small, but full of meat. I come in a dozen, a salty treat. What am I?",
-      answer: "oyster",
-    },
+  "fish-cafe": [
     {
       question:
         "My scales shine bright, I smell a bit bold. You\u2019ll find me fresh, smoked, or cold. What am I?",
@@ -55,28 +15,8 @@ export const roomRiddlesWithAnswers = {
   ],
   "gambling-den": [
     {
-      question:
-        "I\u2019m rolled but not a wheel, tossed to make a deal. What am I?",
-      answer: "dice",
-    },
-    {
-      question:
-        "Black and red, I spin around, people cheer when I slow down. What am I?",
-      answer: "roulette",
-    },
-    {
       question: "I'm full of cards but not a greeting. What am I?",
       answer: "deck",
-    },
-    {
-      question:
-        "Win or lose, I bring delight. Flashy lights and sounds so bright. What am I?",
-      answer: "slot machine",
-    },
-    {
-      question:
-        "You bet on me, I raise the stakes. Sometimes I bluff, sometimes I break. What am I?",
-      answer: "poker",
     },
   ],
   "bakery-bread-shop": [
@@ -240,7 +180,7 @@ export const roomRiddlesWithAnswers = {
       answer: "undersea style",
     },
   ],
-  "fish-art-gallery": [
+  museum: [
     {
       question:
         "I hang on walls, but I\u2019m not a coat. I show the sea, the waves, the boat. What am I?",

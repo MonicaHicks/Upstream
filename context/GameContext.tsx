@@ -5,6 +5,8 @@ import { rooms as initialRooms } from "@/data/rooms";
 import { Player, Room } from "@/types/types";
 import React, { createContext, useContext, useState } from "react";
 
+import { clueSets } from "@/data/clues";
+
 type GameContextType = {
   players: Player[];
   rooms: Room[];
@@ -37,6 +39,16 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
     );
     setRooms((prev) =>
       prev.map((r) => (r.id === roomId ? { ...r, unlocked: true } : r))
+    );
+  };
+
+  const assignClues = () => {
+    const shuffled = [...clueSets].sort(() => Math.random() - 0.5);
+    setPlayers((prev) =>
+      prev.map((player, i) => ({
+        ...player,
+        secretGoal: shuffled[i],
+      }))
     );
   };
 

@@ -13,4 +13,5 @@ export type Room = {
   name: string;
   color: string;
   unlocked: boolean;
+  image: any;
 };
