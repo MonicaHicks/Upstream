@@ -9,7 +9,6 @@ import {
   View,
 } from "react-native";
 import ConfettiCannon from "react-native-confetti-cannon";
-
 type Props = {
   onWin: () => void;
 };
@@ -17,12 +16,32 @@ type Props = {
 export default function OpenUpShop({ onWin }: Props) {
   const { currentPlayer } = useGame();
   const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
-  const [attempts, setAttempts] = useState<
-    { rooms: string[]; result: string[] }[]
-  >([]);
+  const [feedback, setFeedback] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  const secretRooms = currentPlayer?.secretGoal?.rooms || [];
+  const visited = currentPlayer?.roomsVisited || [];
+  const secret = currentPlayer?.secretGoal.rooms || [];
+
+  if (!currentPlayer || visited.length === 0) {
+    return (
+      <View>
+        <Text style={{ textAlign: "center", fontSize: 24, color: "black" }}>
+          You haven’t visited any rooms yet!
+        </Text>
+
+        <Text
+          style={{
+            textAlign: "center",
+            marginTop: 18,
+            fontSize: 24,
+            color: "black",
+          }}
+        >
+          Your clue is: {currentPlayer?.secretGoal.clue}
+        </Text>
+      </View>
+    );
+  }
 
   const toggleRoom = (roomId: string) => {
     if (selectedRooms.includes(roomId)) {
@@ -32,50 +51,49 @@ export default function OpenUpShop({ onWin }: Props) {
     }
   };
 
-  const handleGuess = () => {
-    if (!currentPlayer || selectedRooms.length !== 3) return;
+  const handleSubmit = () => {
+    const correctCount = selectedRooms.filter((r) => secret.includes(r)).length;
+    setFeedback(`${correctCount} out of 3 correct`);
 
-    const result = selectedRooms.map((r, i) => {
-      if (r === secretRooms[i]) return "🟩";
-      if (secretRooms.includes(r)) return "🟨";
-      return "⬜";
-    });
-
-    const newAttempts = [...attempts, { rooms: selectedRooms, result }];
-    setAttempts(newAttempts);
-    setSelectedRooms([]);
-
-    // 🎉 Check for win
-    if (result.every((symbol) => symbol === "🟩")) {
+    if (correctCount === 3) {
       setShowConfetti(true);
-      onWin(); // Callback to parent
+      onWin();
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Guess Your Rooms</Text>
-      <Text style={styles.title}>
-        Your Clue Is: {currentPlayer?.secretGoal.clue}
+      <Text style={{ fontSize: 30 }}>
+        Your clue is: {currentPlayer.secretGoal.clue}
       </Text>
+      <Text style={styles.title}>Select 3 rooms you think are your goal:</Text>
 
-      <View style={{ flexWrap: "wrap", flexDirection: "row", gap: 6 }}>
-        {rooms.map((room) => (
-          <TouchableOpacity
-            key={room.id}
-            onPress={() => toggleRoom(room.id)}
-            style={{
-              padding: 10,
-              margin: 4,
-              borderRadius: 8,
-              backgroundColor: selectedRooms.includes(room.id)
-                ? "#4A90E2"
-                : "#ccc",
-            }}
-          >
-            <Text>{room.name}</Text>
-          </TouchableOpacity>
-        ))}
+      <View
+        style={{
+          flexWrap: "wrap",
+          justifyContent: "center",
+          flexDirection: "row",
+          gap: 6,
+        }}
+      >
+        {rooms
+          .filter((r) => visited.includes(r.id))
+          .map((room) => (
+            <TouchableOpacity
+              key={room.id}
+              onPress={() => toggleRoom(room.id)}
+              style={{
+                padding: 10,
+                margin: 4,
+                borderRadius: 8,
+                backgroundColor: selectedRooms.includes(room.id)
+                  ? "#4A90E2"
+                  : "#ccc",
+              }}
+            >
+              <Text>{room.name}</Text>
+            </TouchableOpacity>
+          ))}
       </View>
 
       <Text style={styles.subtitle}>
@@ -85,30 +103,18 @@ export default function OpenUpShop({ onWin }: Props) {
           .join(", ")}
       </Text>
 
+      {feedback && <Text style={styles.result}>{feedback}</Text>}
+
       <TouchableOpacity
         style={[
           styles.button,
           { opacity: selectedRooms.length === 3 ? 1 : 0.4 },
         ]}
-        disabled={selectedRooms.length !== 3}
-        onPress={handleGuess}
+        disabled={selectedRooms.length < 1}
+        onPress={handleSubmit}
       >
         <Text style={styles.buttonText}>Check</Text>
       </TouchableOpacity>
-
-      {attempts.map((attempt, i) => (
-        <View key={i} style={styles.row}>
-          {attempt.rooms.map((roomId, j) => {
-            const roomName = rooms.find((r) => r.id === roomId)?.name || roomId;
-            return (
-              <View key={j} style={styles.box}>
-                <Text style={styles.boxText}>{roomName}</Text>
-                <Text style={styles.feedback}>{attempt.result[j]}</Text>
-              </View>
-            );
-          })}
-        </View>
-      ))}
 
       {showConfetti && (
         <ConfettiCannon
@@ -123,23 +129,27 @@ export default function OpenUpShop({ onWin }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flexGrow: 1, padding: 24, gap: 20 },
+  container: { padding: 24, gap: 20 },
   title: { fontSize: 20, fontWeight: "bold", textAlign: "center" },
   subtitle: { fontSize: 14, textAlign: "center", color: "#666" },
   button: {
-    backgroundColor: "#333",
+    backgroundColor: "#222",
     padding: 12,
     borderRadius: 8,
-    marginTop: 12,
+    marginTop: 5,
   },
   buttonText: { color: "white", fontWeight: "bold", textAlign: "center" },
-  row: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 8,
-    marginTop: 12,
+  result: {
+    marginTop: 16,
+    fontSize: 18,
+    textAlign: "center",
+    fontWeight: "bold",
   },
-  box: { alignItems: "center", padding: 6 },
-  boxText: { fontSize: 14, fontWeight: "bold" },
-  feedback: { fontSize: 24 },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+    color: "black",
+  },
 });

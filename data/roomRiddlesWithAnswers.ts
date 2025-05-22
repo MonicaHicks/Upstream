@@ -2,37 +2,43 @@ export const roomRiddlesWithAnswers = {
   tarot: [
     {
       question:
+        "Though I’m clear, I cloud your mind, Revealing truths you’ve yet to find.\nGaze too deep and you may see, A fate reflected back at thee.\nWhat am I?",
+      answer: "crystal ball",
+    },
+    {
+      question:
         "I speak without a mouth and hear without ears. I have no body, but I come alive with insight. What am I?",
       answer: "a vision",
     },
-  ],
-  "fish-cafe": [
     {
       question:
-        "My scales shine bright, I smell a bit bold. You\u2019ll find me fresh, smoked, or cold. What am I?",
-      answer: "mackerel",
+        "Ten I hold and lines I trace, A map of time upon your face.\n No cards, no stars—just flesh and fate, In every curve, a future waits. What am I?",
+      answer: "?",
     },
   ],
-  "fish-pub-bar": [
+  bakery: [{ question: "What uses a cane, but cannot walk?", answer: "sugar" }],
+  "gambling-den": [
     {
       question:
-        "I pour without hands, I spill without shame. I make you loud or sleepy with blame. What am I?",
-      answer: "alcohol",
+        "Some people are two-faced, but I have 6. To introduce chance, put me in the mix.\nWhat am I?",
+      answer: "dice",
     },
+  ],
+  "fish-pub": [
     {
       question:
-        "I\u2019m bubbly and cold, gold in a glass. You sip me slow, or chug me fast. What am I?",
+        "A head with no shoulders, Can't jump but it hops. Trapped in a barrel, Taken out of your crops. What am I?",
       answer: "beer",
     },
     {
       question:
-        "Shaken or stirred, I come with a twist. At happy hour, I\u2019m top of the list. What am I?",
+        "Shaken or stirred, I come with a twist. At happy hour, I\u2019m top of the list.\nI'm not an animal, but I have a tail. At fancy bars, you'll find me for sale.\nWhat am I?",
       answer: "cocktail",
     },
     {
       question:
-        "You\u2019ll find me on tap or in a bottle. Drink too much and you\u2019ll wobble. What am I?",
-      answer: "drink",
+        "You can find me on tap or in a bottle. Drink too much and you will wobble.\nI come in a range of concentrations, but you can find me in nearly all nations.\nWhat am I?",
+      answer: "alcohol",
     },
     {
       question:
@@ -43,190 +49,130 @@ export const roomRiddlesWithAnswers = {
   "souvenir-shop": [
     {
       question:
-        "I\u2019m small and cheap, from places you roam. You buy me to say, \u201cI brought this home.\u201d What am I?",
+        "I loom over Paris, metal and tall. On magnets, mugs, and shirts I'm found.\nWhat am I?",
+      answer: "eiffel tower",
+    },
+    {
+      question:
+        "I'm small and cheap, from places you roam. You buy me to say, 'I brought this home.'\nWhat am I?",
       answer: "souvenir",
     },
     {
       question:
-        "I often have a name or date, I live on magnets, shirts, or a plate. What am I?",
-      answer: "keepsake",
+        "I once had worth but lost my shine, Now stretched and stamped with a brand-new sign.\nA keepsake made with weight and wheel, I trade my face for tourist appeal.\nFlat as memory, small as a wish, You made me yours with just a twist.",
+      answer: "pressed penny",
     },
     {
       question:
-        "I\u2019m not from here, yet here I stay. You give me when you go away. What am I?",
-      answer: "trinket",
-    },
-    {
-      question:
-        "I'm shaped like the place you left behind, a memory you can always find. What am I?",
+        "I'm covered in images of the place you left behind, a memory you mail for your loved ones to find. What am I?",
       answer: "postcard",
-    },
-    {
-      question:
-        "You hang me on keys or fridges too. I\u2019m bought in shops, in red or blue. What am I?",
-      answer: "keychain",
     },
   ],
   "hat-store": [
     {
-      question:
-        "I sit on your head but don\u2019t weigh much. I come in styles, colors, and such. What am I?",
+      question: "What is Missing a Double You",
       answer: "hat",
     },
     {
       question:
-        "I shade your eyes and block the sun. Cowboys wear me when they run. What am I?",
-      answer: "brim",
-    },
-    {
-      question:
-        "I can be pointy, round, or flat. I\u2019m often worn by a fancy cat. What am I?",
+        "I am stylish, round, and flat. You might see me on an artist or Parisian diplomat. \nWhat am I?",
       answer: "beret",
     },
     {
       question:
-        "I\u2019m part of your costume, or maybe your flair. Some tip me politely to show that you care. What am I?",
+        "Pair me with a suit for an extra dash of flair. Tip me politely to show that you care. What am I?",
       answer: "top hat",
     },
     {
       question:
-        "I\u2019m stitched with care and snug with pride. In winter months, I\u2019m worn outside. What am I?",
+        "I'm stitched with care and snug with pride. In winter months, I'm worn outside. What am I?",
       answer: "beanie",
     },
   ],
   "kelp-nursery": [
     {
       question:
-        "I sway with the ocean, green and long. I\u2019m not a tree, but I still grow strong. What am I?",
-      answer: "kelp",
-    },
-    {
-      question:
-        "I\u2019m planted underwater, safe from harm. Fish babies grow up on my farm. What am I?",
-      answer: "nursery reef",
-    },
-    {
-      question:
-        "I\u2019m not lettuce, but I live in a bed. I tickle fish and sea snail head. What am I?",
+        "I drape the rocks in olive green, A sea-born thread, both soft and lean.\nIn soups and wraps I find my fate, A sushi wrap or seaside plate. What am I?",
       answer: "seaweed",
     },
     {
       question:
-        "I grow fast, can feed or wrap. Sushi loves me \u2014 that\u2019s a fact. What am I?",
-      answer: "nori",
-    },
-    {
-      question:
-        "I photosynthesize just like trees. I live in waves and sway with ease. What am I?",
-      answer: "marine algae",
+        "I’m no flower, though I bloom below, In watery fields where warm tides go.\nI give the sea a breath to share, Though you may never see me there. What am I?",
+      answer: "algae",
     },
   ],
   "fish-fashion": [
     {
       question:
-        "I shimmer and shine, I scale the style charts. I\u2019m worn with pride on fishy parts. What am I?",
-      answer: "sequins",
+        "I'm typically blue, but come in all colors. Compared to most pants, I'm thicker than others.\nWhat am I?",
+      answer: "jeans",
     },
     {
       question:
-        "I\u2019m stitched for gills and tailored fins. I'm haute couture for those who swim. What am I?",
-      answer: "fishwear",
-    },
-    {
-      question:
-        "I\u2019m flashy, splashy, often bold. I make fish look fierce and cold. What am I?",
-      answer: "fin-coat",
-    },
-    {
-      question:
-        "I\u2019m tight like a tail, sleek as can be. I\u2019m runway-ready from sea to sea. What am I?",
-      answer: "mermaid gown",
-    },
-    {
-      question:
-        "I\u2019m high fashion under sea, I trend in coral and anemone. What am I?",
-      answer: "undersea style",
+        "I'm worn on the legs to make an outfit spicy. You'd be freezing cold if you wear me when it's icy.\nWhat am I?",
+      answer: "fishnets",
     },
   ],
-  "museum": [
+  museum: [
     {
       question:
-        "I hang on walls, but I\u2019m not a coat. I show the sea, the waves, the boat. What am I?",
+        "I hang on the wall with my world-renowned smile. To see me in paris, you'll be waiting a while.\nWho am I?",
+      answer: "mona lisa",
+    },
+    {
+      question:
+        "I'm made with a brush and many strokes. Bob Ross loved me, and so do other folks.\nWhat am I?",
       answer: "painting",
-    },
-    {
-      question:
-        "I\u2019m not a fish, but I portray one. I\u2019m made with brush or sometimes fun. What am I?",
-      answer: "artwork",
-    },
-    {
-      question:
-        "I\u2019m inked in color, maybe a frame. I hold emotion, not just a name. What am I?",
-      answer: "print",
-    },
-    {
-      question:
-        "You gaze at me and feel things deep. I hang in galleries, never sleep. What am I?",
-      answer: "abstract",
-    },
-    {
-      question:
-        "I\u2019m made by fin or flipper hand. I capture beauty in the sand. What am I?",
-      answer: "sculpture",
     },
   ],
   "hair-salon": [
     {
       question:
-        "I cut but I\u2019m not sharp. I style but I\u2019m not clothes. I shape your top but never your toes. What am I?",
-      answer: "hairdresser",
+        "Before your service, I'm laid down with care. I cover your shoulders to protect you from hair.\nWhat am I?",
+      answer: "cape",
     },
     {
       question:
-        "You sit in my chair, I spin you around. I clip and I trim without a sound. What am I?",
-      answer: "salon chair",
-    },
-    {
-      question:
-        "With scissors and sprays, I work all day. I shape your curls and blow-dry away. What am I?",
-      answer: "stylist",
-    },
-    {
-      question:
-        "I\u2019m filled with mirrors and buzzing sounds. You leave me new from all around. What am I?",
-      answer: "hair salon",
-    },
-    {
-      question:
-        "From shag to bob to pixie cut, you come to me when hair\u2019s a rut. What am I?",
-      answer: "haircut",
+        "Look at me and I look just like you! To see the back of your head, you will need two.\nWhat am I?",
+      answer: "mirror",
     },
   ],
   "stationary-shop": [
     {
       question:
-        "I\u2019m flat and white and love to be written. I\u2019m stacked in piles or sometimes ribboned. What am I?",
-      answer: "paper",
+        "I bind your words and hold your thoughts, I'm ruled or blank, with spiral knots. What am I?",
+      answer: "notebook",
     },
     {
       question:
-        "I help you write with ink or lead. I\u2019m gripped in hand, not used in bed. What am I?",
+        "I help you write with gel or ink. Put me to paper to help you think. What am I?",
       answer: "pen",
     },
     {
       question:
-        "You send me with a stamp and note, I\u2019m sealed and sent with words you wrote. What am I?",
+        "You send me with a stamp and note, I'm sealed and sent with words you wrote. What am I?",
       answer: "envelope",
     },
     {
       question:
-        "I\u2019m sticky and small, for memos I\u2019m best. You jot on me what you don\u2019t want to forget. What am I?",
-      answer: "sticky note",
+        "I’m stuck on helping, that’s my style, I roll or rip and stretch a mile.\nYou’ll find me near a wrapping spree, Or holding posters where they should be.\nWhat am I?",
+      answer: "tape",
     },
     {
       question:
-        "I bind your words and hold your thoughts, I\u2019m ruled or blank, with spiral knots. What am I?",
-      answer: "notebook",
+        "I vanish your flaws without a trace, Though I often leave a smudgy place.\nYou pair me with graphite, never with ink, Rub me too hard—I’ll snap, not shrink.\nWhat am I?",
+      answer: "eraser",
+    },
+  ],
+  "fish-cafe": [
+    {
+      question: "What starts with T, ends with T, and has T inside it?",
+      answer: "?",
+    },
+    {
+      question:
+        "I'm sweet and creamy, light and fluffly. I go ontop of drinks or in a cup for your puppy.\nWhat am I?",
+      answer: "whipped cream",
     },
   ],
 };

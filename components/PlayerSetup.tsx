@@ -4,6 +4,8 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   FlatList,
+  Image,
+  ImageStyle,
   Modal,
   StyleSheet,
   Text,
@@ -54,7 +56,14 @@ export default function PlayerSetupScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Upstream</Text>
+      <View style={{ alignItems: "center" }}>
+        <View style={styles.imageBackground}>
+          <Image
+            source={require("../assets/images/UpstreamLogo.png")}
+            style={styles.logo}
+          />
+        </View>
+      </View>
       <Text style={styles.title}>Enter Player Names</Text>
       <FlatList
         data={playerNames}
@@ -96,7 +105,12 @@ export default function PlayerSetupScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, justifyContent: "center", gap: 16 },
+  container: {
+    flex: 1,
+    padding: 24,
+    justifyContent: "center",
+    gap: 16,
+  },
   title: {
     color: "white",
     fontSize: 32,
@@ -104,6 +118,19 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 40,
     marginBottom: 20,
+  },
+  logo: {
+    width: 200,
+    height: 200,
+    resizeMode: "contain", // ✅ for Image
+  } as ImageStyle,
+  imageBackground: {
+    width: 190,
+    height: 190,
+    borderRadius: 95,
+    backgroundColor: "#90D5FF",
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
     fontWeight: "bold",

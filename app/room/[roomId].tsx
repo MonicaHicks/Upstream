@@ -1,3 +1,4 @@
+// Full updated RoomScreen.tsx
 import BakeryGame from "@/components/BakeryGame";
 import GamblingGame from "@/components/GamblingGame";
 import OpenUpShop from "@/components/OpenUpShop";
@@ -6,9 +7,11 @@ import { useGame } from "@/context/GameContext";
 import { roomRiddlesWithAnswers } from "@/data/roomRiddlesWithAnswers";
 import { checkAnswer } from "@/utils/checkAnswer";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ImageBackground,
+  Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -21,16 +24,25 @@ export default function RoomScreen() {
   const { rooms, currentPlayer, markRoomVisited, markChallengeSolved } =
     useGame();
   const router = useRouter();
+  const [randomIndex, setRandomIndex] = useState(0);
+
+  useEffect(() => {
+    if (riddles && riddles.length > 0) {
+      const index = Math.floor(Math.random() * riddles.length);
+      setRandomIndex(index);
+    }
+  }, [roomId]); // ← reroll when roomId changes
 
   const room = rooms.find((r) => r.id === roomId);
   const riddles =
     roomId &&
     roomRiddlesWithAnswers[roomId as keyof typeof roomRiddlesWithAnswers];
-  const riddle = riddles?.[0] as { question: string; answer: string };
+  const riddle = riddles?.[randomIndex] as { question: string; answer: string };
 
   const [input, setInput] = useState("");
   const [solved, setSolved] = useState(false);
   const [feedback, setFeedback] = useState("");
+  const [chosenMode, setChosenMode] = useState<"riddle" | "game" | null>(null);
 
   if (!room || !currentPlayer) {
     return (
@@ -46,39 +58,27 @@ export default function RoomScreen() {
       markRoomVisited(room.id);
       markChallengeSolved(room.id);
       setSolved(true);
-      setFeedback("✅ Correct!");
+      setFeedback("Correct!");
     } else {
-      setFeedback("❌ Try again.");
+      setFeedback("Try again.");
     }
   };
 
-  const handleGamblingWin = () => {
+  const handleGameWin = (msg: string) => {
     markRoomVisited(room.id);
     markChallengeSolved(room.id);
     setSolved(true);
-    setFeedback("Gambling Ace!");
+    setFeedback(msg);
   };
 
-  const handleOpenUpShopWin = () => {
-    markRoomVisited(room.id);
-    markChallengeSolved(room.id);
-    setSolved(true);
-    setFeedback("You're ready to open!");
-  };
-
-  const handleBakeryWin = () => {
-    markRoomVisited(room.id);
-    markChallengeSolved(room.id);
-    setSolved(true);
-    setFeedback("Pro Baker!");
-  };
-
-  const handleTarotWin = () => {
-    markRoomVisited(room.id);
-    markChallengeSolved(room.id);
-    setSolved(true);
-    setFeedback("Tarot Master!");
-  };
+  const hasMiniGame = [
+    "bakery",
+    "gambling-den",
+    "tarot",
+    "open-up-shop",
+  ].includes(room.id);
+  const hasRiddle = !!riddle;
+  const showChoice = hasMiniGame && hasRiddle && !chosenMode && !solved;
 
   return (
     <ImageBackground
@@ -86,7 +86,7 @@ export default function RoomScreen() {
       style={styles.background}
       resizeMode="cover"
     >
-      <View style={styles.overlay}>
+      <ScrollView style={styles.overlay}>
         <Text style={styles.header}>{room.name}</Text>
         <Text style={styles.subtext}>
           Solving as:{" "}
@@ -94,35 +94,37 @@ export default function RoomScreen() {
         </Text>
 
         <View style={styles.riddleBox}>
-          {room.id === "gambling-den" ? (
-            <>
-              <GamblingGame onWin={handleGamblingWin} />
-              {feedback !== "" && (
-                <Text style={styles.feedback}>{feedback}</Text>
-              )}
-            </>
-          ) : room.id === "bakery" ? (
-            <>
-              <BakeryGame onWin={handleBakeryWin} />
-              {feedback !== "" && (
-                <Text style={styles.feedback}>{feedback}</Text>
-              )}
-            </>
-          ) : room.id === "open-up-shop" ? (
-            <>
-              <OpenUpShop onWin={handleOpenUpShopWin} />
-              {feedback !== "" && (
-                <Text style={styles.feedback}>{feedback}</Text>
-              )}
-            </>
-          ) : room.id === "tarot" ? (
-            <>
-              <TarotGame onWin={handleTarotWin} />
-              {feedback !== "" && (
-                <Text style={styles.feedback}>{feedback}</Text>
-              )}
-            </>
-          ) : riddle ? (
+          {showChoice && (
+            <Modal transparent visible animationType="fade">
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                  <Text
+                    style={{
+                      fontSize: 24,
+                      marginBottom: 16,
+                      textAlign: "center",
+                    }}
+                  >
+                    How do you want to play this room?
+                  </Text>
+                  <TouchableOpacity
+                    style={[styles.button, { marginBottom: 10 }]}
+                    onPress={() => setChosenMode("riddle")}
+                  >
+                    <Text style={styles.buttonText}>Solve Riddle</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => setChosenMode("game")}
+                  >
+                    <Text style={styles.buttonText}>Play Mini Game</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          )}
+
+          {!solved && (!hasMiniGame || chosenMode === "riddle") && riddle && (
             <>
               <Text style={styles.riddleText}>{riddle.question}</Text>
               <TextInput
@@ -139,13 +141,29 @@ export default function RoomScreen() {
               >
                 <Text style={styles.buttonText}>Submit</Text>
               </TouchableOpacity>
-              {feedback !== "" && (
-                <Text style={styles.feedback}>{feedback}</Text>
+            </>
+          )}
+
+          {((!solved && chosenMode === "game") || !hasRiddle) && (
+            <>
+              {room.id === "gambling-den" && (
+                <GamblingGame onWin={() => handleGameWin("🎲 Gambling Ace!")} />
+              )}
+              {room.id === "bakery" && (
+                <BakeryGame onWin={() => handleGameWin("🥖 Pro Baker!")} />
+              )}
+              {room.id === "tarot" && (
+                <TarotGame onWin={() => handleGameWin("🔮 Tarot Master!")} />
+              )}
+              {room.id === "open-up-shop" && (
+                <OpenUpShop
+                  onWin={() => handleGameWin("🏪 You're ready to open!")}
+                />
               )}
             </>
-          ) : (
-            <Text>No puzzle found for this room.</Text>
           )}
+
+          {feedback !== "" && <Text style={styles.feedback}>{feedback}</Text>}
 
           <TouchableOpacity
             onPress={() => router.back()}
@@ -154,13 +172,12 @@ export default function RoomScreen() {
             <Text style={styles.buttonText}>Back to Map</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, justifyContent: "center" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   header: {
     fontSize: 42,
@@ -181,7 +198,7 @@ const styles = StyleSheet.create({
     padding: 20,
     elevation: 2,
   },
-  riddleText: { fontSize: 18, marginBottom: 16 },
+  riddleText: { fontSize: 18, marginBottom: 16, textAlign: "center" },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
@@ -189,18 +206,40 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
   },
-  button: { backgroundColor: "#222", padding: 12, borderRadius: 8 },
-  buttonText: { color: "white", textAlign: "center", fontWeight: "bold" },
+  button: {
+    backgroundColor: "#222",
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 5,
+  },
+  buttonText: {
+    color: "white",
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 18,
+  },
   feedback: { marginTop: 12, fontSize: 16, textAlign: "center" },
   background: {
     flex: 1,
     justifyContent: "center",
   },
-
   overlay: {
     flex: 1,
     padding: 24,
     paddingTop: 60,
-    backgroundColor: "rgba(0,0,0,0.4)", // dim background slightly for readability
+    backgroundColor: "rgba(0,0,0,0.4)",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 24,
+    borderRadius: 12,
+    width: "80%",
+    alignItems: "center",
   },
 });
