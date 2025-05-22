@@ -1,5 +1,7 @@
 import BakeryGame from "@/components/BakeryGame";
 import GamblingGame from "@/components/GamblingGame";
+import OpenUpShop from "@/components/OpenUpShop";
+import TarotGame from "@/components/TarotGame";
 import { useGame } from "@/context/GameContext";
 import { roomRiddlesWithAnswers } from "@/data/roomRiddlesWithAnswers";
 import { checkAnswer } from "@/utils/checkAnswer";
@@ -57,11 +59,25 @@ export default function RoomScreen() {
     setFeedback("Gambling Ace!");
   };
 
+  const handleOpenUpShopWin = () => {
+    markRoomVisited(room.id);
+    markChallengeSolved(room.id);
+    setSolved(true);
+    setFeedback("You're ready to open!");
+  };
+
   const handleBakeryWin = () => {
     markRoomVisited(room.id);
     markChallengeSolved(room.id);
     setSolved(true);
     setFeedback("Pro Baker!");
+  };
+
+  const handleTarotWin = () => {
+    markRoomVisited(room.id);
+    markChallengeSolved(room.id);
+    setSolved(true);
+    setFeedback("Tarot Master!");
   };
 
   return (
@@ -88,6 +104,20 @@ export default function RoomScreen() {
           ) : room.id === "bakery" ? (
             <>
               <BakeryGame onWin={handleBakeryWin} />
+              {feedback !== "" && (
+                <Text style={styles.feedback}>{feedback}</Text>
+              )}
+            </>
+          ) : room.id === "open-up-shop" ? (
+            <>
+              <OpenUpShop onWin={handleOpenUpShopWin} />
+              {feedback !== "" && (
+                <Text style={styles.feedback}>{feedback}</Text>
+              )}
+            </>
+          ) : room.id === "tarot" ? (
+            <>
+              <TarotGame onWin={handleTarotWin} />
               {feedback !== "" && (
                 <Text style={styles.feedback}>{feedback}</Text>
               )}
@@ -137,7 +167,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     color: "white",
-    marginTop: 100,
+    marginTop: 50,
   },
   subtext: {
     fontSize: 30,

@@ -13,38 +13,6 @@ export const roomRiddlesWithAnswers = {
       answer: "mackerel",
     },
   ],
-  "gambling-den": [
-    {
-      question: "I'm full of cards but not a greeting. What am I?",
-      answer: "deck",
-    },
-  ],
-  "bakery-bread-shop": [
-    {
-      question:
-        "I\u2019m not alive, but I grow. I don\u2019t have lungs, but I need air. What am I?",
-      answer: "dough",
-    },
-    {
-      question: "The more you take from me, the bigger I get. What am I?",
-      answer: "hole",
-    },
-    {
-      question:
-        "I rise but never sleep, I\u2019m golden when I\u2019m done. Find me in ovens, crispy and fun. What am I?",
-      answer: "bread",
-    },
-    {
-      question:
-        "I\u2019m twisted and salty, a snack from the past. With German roots, I\u2019m made to last. What am I?",
-      answer: "pretzel",
-    },
-    {
-      question:
-        "I\u2019m sweet but not cake, flaky with layers to bake. Eat me in Paris, I\u2019m worth the mistake. What am I?",
-      answer: "croissant",
-    },
-  ],
   "fish-pub-bar": [
     {
       question:
@@ -180,7 +148,7 @@ export const roomRiddlesWithAnswers = {
       answer: "undersea style",
     },
   ],
-  museum: [
+  "museum": [
     {
       question:
         "I hang on walls, but I\u2019m not a coat. I show the sea, the waves, the boat. What am I?",

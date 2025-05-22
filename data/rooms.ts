@@ -87,4 +87,11 @@ export const rooms: Room[] = [
     unlocked: true,
     image: require("@/assets/images/stationary.png"),
   },
+  {
+    id: "open-up-shop",
+    name: "Open Up Shop",
+    color: "#fff",
+    unlocked: true,
+    image: require("@/assets/images/openUpShop.png"),
+  },
 ];

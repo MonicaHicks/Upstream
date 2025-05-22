@@ -9,6 +9,7 @@ import { clueSets } from "@/data/clues";
 
 type GameContextType = {
   players: Player[];
+  setPlayers: (players: Player[]) => void;
   rooms: Room[];
   currentPlayer: Player | null;
   selectPlayer: (id: string) => void;
@@ -75,6 +76,7 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
     <GameContext.Provider
       value={{
         players,
+        setPlayers, // <- add this line
         rooms,
         currentPlayer,
         selectPlayer,

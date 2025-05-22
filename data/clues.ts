@@ -1,18 +1,22 @@
 export const clueSets = [
   {
-    clue: "style",
+    clue: "sharp",
     rooms: ["hat-store", "fish-fashion", "hair-salon"],
   },
   {
-    clue: "food",
-    rooms: ["bakery-bread-shop", "fish-market-stall", "fish-pub-bar"],
+    clue: "layers",
+    rooms: ["fish-fashion", "hair-salon", "bakery"],
+  },
+  {
+    clue: "reflection",
+    rooms: ["tarot", "hair-salon", "museum"],
   },
   {
     clue: "craft",
-    rooms: ["stationary-shop", "souvenir-shop", "fish-art-gallery"],
+    rooms: ["stationary-shop", "fish-pub", "museum"],
   },
   {
     clue: "eccentric",
-    rooms: ["tarot-card", "kelp-nursery", "gambling-den"],
+    rooms: ["tarot", "kelp-nursery", "gambling-den"],
   },
 ];

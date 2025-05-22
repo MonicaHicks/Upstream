@@ -1,5 +1,3 @@
-// app/index.tsx
-
 import { useGame } from "@/context/GameContext";
 import { Player, Room } from "@/types/types";
 import { useRouter } from "expo-router";
@@ -13,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import PlayerSetupScreen from "./setup";
 
 export default function HomeScreen() {
   const { rooms, players, selectPlayer } = useGame();
@@ -31,6 +30,15 @@ export default function HomeScreen() {
     setShowModal(false);
     router.push(`/room/${selectedRoom?.id}` as any);
   };
+
+  // Temporary screen while redirecting
+  if (players.length === 0) {
+    return (
+      <View style={styles.container}>
+        <PlayerSetupScreen />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
