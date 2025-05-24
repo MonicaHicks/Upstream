@@ -1,5 +1,12 @@
-import { Stack } from "expo-router";
+// app/layout.tsx
 
-export default function RootLayout() {
-  return <Stack />;
+import { GameProvider } from "@/context/GameContext";
+import { Slot } from "expo-router";
+
+export default function Layout() {
+  return (
+    <GameProvider>
+      <Slot />
+    </GameProvider>
+  );
 }
