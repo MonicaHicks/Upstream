@@ -1,4 +1,5 @@
 // Full updated RoomScreen.tsx
+import Anagram from "@/components/Anagram";
 import BakeryGame from "@/components/BakeryGame";
 import GamblingGame from "@/components/GamblingGame";
 import HangmanGame from "@/components/HangmanGame";
@@ -79,6 +80,7 @@ export default function RoomScreen() {
     "tarot",
     "open-up-shop",
     "stationary-shop",
+    "fish-pub",
   ].includes(room.id);
   const hasRiddle = !!riddle;
   const showChoice = hasMiniGame && hasRiddle && !chosenMode && !solved;
@@ -166,6 +168,13 @@ export default function RoomScreen() {
               {room.id === "stationary-shop" && (
                 <HangmanGame
                   onWin={() => handleGameWin("🖊️ Stationery Star!")}
+                />
+              )}
+              {room.id === "fish-pub" && (
+                <Anagram
+                  onWin={() =>
+                    handleGameWin("🍻 You’re not too drunk to read!")
+                  }
                 />
               )}
             </>
