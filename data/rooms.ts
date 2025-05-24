@@ -82,7 +82,7 @@ export const rooms: Room[] = [
   },
   {
     id: "stationary-shop",
-    name: "Stationary Shop",
+    name: "Stationery Shop",
     color: "#AED9E0",
     unlocked: true,
     image: require("@/assets/images/stationary.png"),

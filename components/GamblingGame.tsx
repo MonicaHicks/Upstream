@@ -25,7 +25,7 @@ export default function GamblingGame({ onWin }: Props) {
 
   const animation = useRef(new Animated.Value(0)).current;
 
-  const rollDie = () => Math.floor(Math.random() * 6) + 1;
+  const rollDie = () => Math.floor(Math.random() * (5 - 2 + 1)) + 2;
 
   const animateRoll = () => {
     animation.setValue(0);

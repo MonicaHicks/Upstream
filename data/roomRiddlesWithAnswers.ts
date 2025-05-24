@@ -150,7 +150,7 @@ export const roomRiddlesWithAnswers = {
     },
     {
       question:
-        "You send me with a stamp and note, I'm sealed and sent with words you wrote. What am I?",
+        "You send me with a stamp and note, I'm sealed and sent to where you wrote. What am I?",
       answer: "envelope",
     },
     {
