@@ -3,6 +3,7 @@ import Anagram from "@/components/Anagram";
 import BakeryGame from "@/components/BakeryGame";
 import GamblingGame from "@/components/GamblingGame";
 import HangmanGame from "@/components/HangmanGame";
+import KelpSnake from "@/components/KelpSnake";
 import MuseumGame from "@/components/MuseumGame";
 import OpenUpShop from "@/components/OpenUpShop";
 import TarotGame from "@/components/TarotGame";
@@ -83,6 +84,7 @@ export default function RoomScreen() {
     "stationary-shop",
     "fish-pub",
     "museum",
+    "kelp-nursery",
   ].includes(room.id);
   const hasRiddle = !!riddle;
   const showChoice = hasMiniGame && hasRiddle && !chosenMode && !solved;
@@ -181,6 +183,9 @@ export default function RoomScreen() {
               )}
               {room.id === "museum" && (
                 <MuseumGame onWin={() => handleGameWin("🦴 Fossil Finder!")} />
+              )}
+              {room.id === "kelp-nursery" && (
+                <KelpSnake onWin={() => handleGameWin("🌿 Green Thumb!")} />
               )}
             </>
           )}
