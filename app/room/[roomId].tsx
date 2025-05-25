@@ -2,6 +2,7 @@
 import Anagram from "@/components/Anagram";
 import BakeryGame from "@/components/BakeryGame";
 import GamblingGame from "@/components/GamblingGame";
+import HairSalonGame from "@/components/HairSalonGame";
 import HangmanGame from "@/components/HangmanGame";
 import KelpSnake from "@/components/KelpSnake";
 import MuseumGame from "@/components/MuseumGame";
@@ -85,6 +86,7 @@ export default function RoomScreen() {
     "fish-pub",
     "museum",
     "kelp-nursery",
+    "hair-salon",
   ].includes(room.id);
   const hasRiddle = !!riddle;
   const showChoice = hasMiniGame && hasRiddle && !chosenMode && !solved;
@@ -186,6 +188,11 @@ export default function RoomScreen() {
               )}
               {room.id === "kelp-nursery" && (
                 <KelpSnake onWin={() => handleGameWin("🌿 Green Thumb!")} />
+              )}
+              {room.id === "hair-salon" && (
+                <HairSalonGame
+                  onWin={() => handleGameWin("💇 Honey, you've got style!")}
+                />
               )}
             </>
           )}

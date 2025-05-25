@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const CELL_SIZE = 24;
 const GRID_SIZE = 15;
@@ -38,24 +44,26 @@ export default function KelpSnake({ onWin }: Props) {
   const [gameOver, setGameOver] = useState(false);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      switch (e.key) {
-        case "ArrowUp":
-          setDirection({ x: 0, y: -1 });
-          break;
-        case "ArrowDown":
-          setDirection({ x: 0, y: 1 });
-          break;
-        case "ArrowLeft":
-          setDirection({ x: -1, y: 0 });
-          break;
-        case "ArrowRight":
-          setDirection({ x: 1, y: 0 });
-          break;
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    if (Platform.OS === "web") {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        switch (e.key) {
+          case "ArrowUp":
+            setDirection({ x: 0, y: -1 });
+            break;
+          case "ArrowDown":
+            setDirection({ x: 0, y: 1 });
+            break;
+          case "ArrowLeft":
+            setDirection({ x: -1, y: 0 });
+            break;
+          case "ArrowRight":
+            setDirection({ x: 1, y: 0 });
+            break;
+        }
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }
   }, []);
 
   useEffect(() => {
@@ -111,9 +119,9 @@ export default function KelpSnake({ onWin }: Props) {
     );
     const isFood = food.x === x && food.y === y;
     let cellContent = "";
-    if (isHead) cellContent = "🪴"; // potted plant
-    else if (isBody) cellContent = "🌱"; // kelp
-    else if (isFood) cellContent = "☀️"; // sun
+    if (isHead) cellContent = "🪴";
+    else if (isBody) cellContent = "🌱"; // kelp :D
+    else if (isFood) cellContent = "☀️";
 
     return (
       <View key={`${x}-${y}`} style={styles.cell}>
