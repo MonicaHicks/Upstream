@@ -167,7 +167,7 @@ export const roomRiddlesWithAnswers = {
   "fish-cafe": [
     {
       question: "What starts with T, ends with T, and has T inside it?",
-      answer: "?",
+      answer: "teapot",
     },
     {
       question:

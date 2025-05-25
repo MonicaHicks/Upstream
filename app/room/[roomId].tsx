@@ -3,6 +3,7 @@ import Anagram from "@/components/Anagram";
 import BakeryGame from "@/components/BakeryGame";
 import GamblingGame from "@/components/GamblingGame";
 import HangmanGame from "@/components/HangmanGame";
+import MuseumGame from "@/components/MuseumGame";
 import OpenUpShop from "@/components/OpenUpShop";
 import TarotGame from "@/components/TarotGame";
 
@@ -81,6 +82,7 @@ export default function RoomScreen() {
     "open-up-shop",
     "stationary-shop",
     "fish-pub",
+    "museum",
   ].includes(room.id);
   const hasRiddle = !!riddle;
   const showChoice = hasMiniGame && hasRiddle && !chosenMode && !solved;
@@ -176,6 +178,9 @@ export default function RoomScreen() {
                     handleGameWin("🍻 You’re not too drunk to read!")
                   }
                 />
+              )}
+              {room.id === "museum" && (
+                <MuseumGame onWin={() => handleGameWin("🦴 Fossil Finder!")} />
               )}
             </>
           )}
