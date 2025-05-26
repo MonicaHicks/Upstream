@@ -1,21 +1,17 @@
 import { useEffect, useState } from "react";
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const ALL_INGREDIENTS = [
   "Flour",
+  "Vanilla",
+  "Milk",
   "Yeast",
   "Water",
   "Salt",
   "Sugar",
   "Fish Oil",
   "Butter",
-  "Milk",
+  "Cinnamon",
 ];
 
 type Props = {
@@ -23,78 +19,101 @@ type Props = {
 };
 
 export default function BakeryGame({ onWin }: Props) {
-  const [secretRecipe, setSecretRecipe] = useState<string[]>([]);
+  const [round, setRound] = useState(1);
+  const [order, setOrder] = useState<string[]>([]);
+  const [showOrder, setShowOrder] = useState(true);
   const [selected, setSelected] = useState<string[]>([]);
-  const [attemptsLeft, setAttemptsLeft] = useState(5);
+  const [results, setResults] = useState<boolean[]>([]);
   const [feedback, setFeedback] = useState("");
-  const [won, setWon] = useState(false);
+  const [time, setTime] = useState(1000);
 
   useEffect(() => {
-    // Shuffle ingredients and pick 4
-    const shuffled = [...ALL_INGREDIENTS].sort(() => 0.5 - Math.random());
-    setSecretRecipe(shuffled.slice(0, 4));
+    startNewRound();
   }, []);
 
-  const toggleIngredient = (ingredient: string) => {
-    if (won || attemptsLeft <= 0) return;
-    if (selected.includes(ingredient)) {
-      setSelected(selected.filter((i) => i !== ingredient));
-    } else {
-      if (selected.length < 4) setSelected([...selected, ingredient]);
-    }
+  const startNewRound = () => {
+    setSelected([]);
+    setFeedback("");
+    const shuffled = [...ALL_INGREDIENTS].sort(() => 0.5 - Math.random());
+    const newOrder = shuffled.slice(0, 4);
+    setOrder(newOrder);
+    setShowOrder(true);
+    setTime(time - 250);
+    setTimeout(() => {
+      setShowOrder(false);
+    }, time);
   };
 
-  const handleBake = () => {
-    if (won || attemptsLeft <= 0 || selected.length !== 4) return;
-    const correctCount = selected.filter((i) =>
-      secretRecipe.includes(i)
-    ).length;
+  const toggleIngredient = (ingredient: string) => {
+    if (selected.includes(ingredient) || selected.length >= 4) return;
+    setSelected([...selected, ingredient]);
+  };
 
-    if (correctCount === 4) {
-      setWon(true);
-      setFeedback("Perfect! You guessed the full recipe!");
-      onWin();
+  const handleSubmit = () => {
+    if (selected.length !== 4 || !order.length) return;
+
+    const isCorrect =
+      selected.length === order.length &&
+      selected.every((i) => order.includes(i));
+
+    const updatedResults = [...results, isCorrect];
+    setResults(updatedResults);
+
+    if (!isCorrect) {
+      setFeedback(`❌ Round ${round} incorrect!`);
     } else {
-      const nextAttempts = attemptsLeft - 1;
-      setAttemptsLeft(nextAttempts);
-      setFeedback(
-        nextAttempts > 0
-          ? `\u274C ${correctCount} ingredient(s) correct. ${nextAttempts} tries left.`
-          : "\u274C You ran out of attempts!"
-      );
+      setFeedback(`✅ Round ${round} correct!`);
     }
-    setSelected([]);
+
+    if (round === 3) {
+      // Final round - decide win or loss
+      setTimeout(() => {
+        if (updatedResults.every((r) => r)) {
+          onWin();
+        }
+      }, 1000);
+    } else {
+      setTimeout(() => {
+        setRound(round + 1);
+        startNewRound();
+      }, 1500);
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        🍞 Pick 4 ingredients to match the mystery recipe:
-      </Text>
-      <FlatList
-        data={ALL_INGREDIENTS}
-        keyExtractor={(item) => item}
-        numColumns={2}
-        contentContainerStyle={{ gap: 12 }}
-        columnWrapperStyle={{ gap: 12, justifyContent: "center" }}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => toggleIngredient(item)}
-            style={[
-              styles.ingredientButton,
-              selected.includes(item) && styles.selectedIngredient,
-            ]}
-          >
-            <Text style={styles.ingredientText}>{item}</Text>
+      <Text style={styles.title}>🍞 Round {round} of 3</Text>
+      {showOrder ? (
+        <>
+          <Text style={styles.flashText}>🧾 Memorize the Order!</Text>
+          <Text style={styles.orderText}>{order.join("  ·  ")}</Text>
+        </>
+      ) : results.length >= round ? (
+        <Text style={styles.feedback}>{feedback}</Text>
+      ) : (
+        <>
+          <Text style={styles.instructions}>
+            Select the 4 ingredients you saw:
+          </Text>
+          <View style={styles.grid}>
+            {ALL_INGREDIENTS.map((item) => (
+              <TouchableOpacity
+                key={item}
+                onPress={() => toggleIngredient(item)}
+                style={[
+                  styles.ingredientButton,
+                  selected.includes(item) && styles.selectedIngredient,
+                ]}
+              >
+                <Text style={styles.ingredientText}>{item}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <TouchableOpacity onPress={handleSubmit} style={styles.bakeButton}>
+            <Text style={styles.bakeText}>Submit ({selected.length}/4)</Text>
           </TouchableOpacity>
-        )}
-      />
-
-      <TouchableOpacity onPress={handleBake} style={styles.bakeButton}>
-        <Text style={styles.bakeText}>{attemptsLeft} attempt left</Text>
-      </TouchableOpacity>
-
-      {feedback !== "" && <Text style={styles.feedback}>{feedback}</Text>}
+        </>
+      )}
     </View>
   );
 }
@@ -102,6 +121,25 @@ export default function BakeryGame({ onWin }: Props) {
 const styles = StyleSheet.create({
   container: { gap: 20, alignItems: "center" },
   title: { fontSize: 18, fontWeight: "bold", textAlign: "center" },
+  flashText: {
+    fontSize: 16,
+    fontStyle: "italic",
+    marginBottom: 8,
+    color: "#a0522d",
+  },
+  orderText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    padding: 10,
+    backgroundColor: "#ffe5b4",
+    borderRadius: 10,
+    textAlign: "center",
+  },
+  instructions: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 10,
+  },
   ingredientButton: {
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -122,5 +160,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   bakeText: { color: "white", fontWeight: "bold" },
-  feedback: { fontSize: 16, marginTop: 12, textAlign: "center" },
+  feedback: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 20,
+    textAlign: "center",
+  },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 12,
+  },
 });
