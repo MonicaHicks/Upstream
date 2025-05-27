@@ -1,13 +1,21 @@
 import { useEffect, useState } from "react";
 import {
   FlatList,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 
-const CARD_SYMBOLS = ["🌞", "🌜", "⭐", "🪐", "⚡", "🔥"];
+const CARD_IMAGES = [
+  require("../assets/images/tarot/tarot-cross.jpeg"),
+  require("../assets/images/tarot/tarot-cup.jpeg"),
+  require("../assets/images/tarot/tarot-moon.jpeg"),
+  require("../assets/images/tarot/tarot-star.jpeg"),
+  require("../assets/images/tarot/tarot-sun.jpeg"),
+];
+const CARD_BACK_IMAGE = require("../assets/images/tarot/tarot-back.jpeg");
 
 function shuffleCards(): {
   id: number;
@@ -15,8 +23,8 @@ function shuffleCards(): {
   matched: boolean;
   flipped: boolean;
 }[] {
-  const pairs = [...CARD_SYMBOLS, ...CARD_SYMBOLS];
-  //pairs.splice(Math.floor(Math.random() * pairs.length), 1); // Remove one for the odd card
+  const pairs = [...CARD_IMAGES, ...CARD_IMAGES];
+  pairs.splice(Math.floor(Math.random() * pairs.length), 1); // Remove one for the odd card
   const shuffled = pairs.sort(() => 0.5 - Math.random());
   return shuffled.map((symbol, index) => ({
     id: index,
@@ -86,14 +94,20 @@ export default function TarotGame({ onWin }: Props) {
     <TouchableOpacity
       style={[
         styles.card,
-        item.flipped || item.matched ? styles.cardFront : styles.cardBack,
+        item.flipped || item.matched ? styles.card : styles.card,
       ]}
       onPress={() => handleFlip(index)}
       disabled={item.flipped || item.matched}
     >
-      <Text style={styles.cardText}>
-        {item.flipped || item.matched ? item.symbol : "❔"}
-      </Text>
+      {item.flipped || item.matched ? (
+        <Image source={item.symbol} style={styles.card} resizeMode="contain" />
+      ) : (
+        <Image
+          source={CARD_BACK_IMAGE}
+          style={styles.card}
+          resizeMode="contain"
+        />
+      )}
     </TouchableOpacity>
   );
 
@@ -106,7 +120,11 @@ export default function TarotGame({ onWin }: Props) {
         numColumns={3}
         renderItem={renderCard}
         columnWrapperStyle={{ justifyContent: "center" }}
-        contentContainerStyle={{ gap: 10 }}
+        contentContainerStyle={{
+          gap: 10,
+          paddingBottom: 20,
+          height: 280, // ✅ add fixed height to avoid nesting warning
+        }}
       />
       <Text style={styles.feedback}>{feedback}</Text>
     </View>
@@ -124,19 +142,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  cardBack: {
-    backgroundColor: "#3e3e3e",
-  },
-  cardFront: {
-    backgroundColor: "#c9b6f7",
-  },
-  cardText: {
-    fontSize: 28,
-    color: "white",
-  },
   feedback: {
     fontSize: 16,
     marginTop: 12,
     textAlign: "center",
+  },
+  cardImage: {
+    width: 50,
+    height: 50,
   },
 });
