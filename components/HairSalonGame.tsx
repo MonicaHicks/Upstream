@@ -1,11 +1,25 @@
+//flappy bird style hair theme!
+//Idea behind this: player is asked by hairdresser to take over for a little bit
+//You are cutting hair. The "pipes" are hair, and the different colored hair pieces
+//are "dead hair" that you are cutting. Cut 10 to win (will likely reduce this down to 6-8)
+
 import React, { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+
+import chopped from "../assets/images/hairassets/chopped.png";
+import deadHair from "../assets/images/hairassets/dead.png";
+import healthyEnd from "../assets/images/hairassets/healthyend.png";
+import healthyTop from "../assets/images/hairassets/healthytop.png";
+import background from "../assets/images/hairassets/hsmobile.png";
+import scissorsImg from "../assets/images/hairassets/hss.png";
+import topcut from "../assets/images/hairassets/topcut.png";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const GRAVITY = 2;
@@ -18,6 +32,7 @@ const INTERVAL = 50;
 const MIN_HEIGHT = 80;
 const NUM_OBSTACLES = 2;
 const GAME_HEIGHT = 500;
+const SCISSOR_HITBOX_OFFSET = 10;
 
 type Props = {
   onWin: () => void;
@@ -82,8 +97,8 @@ export default function HairSalonGame({ onWin }: Props) {
           const isOverlapping =
             newX < 90 &&
             newX + OBSTACLE_WIDTH > 60 &&
-            scissorY >= obs.topHeight &&
-            scissorY <= obs.topHeight + OBSTACLE_GAP;
+            scissorY + SCISSOR_HITBOX_OFFSET >= obs.topHeight &&
+            scissorY - SCISSOR_HITBOX_OFFSET <= obs.topHeight + OBSTACLE_GAP;
 
           if (newX < -OBSTACLE_WIDTH) {
             newX = SCREEN_WIDTH;
@@ -111,7 +126,8 @@ export default function HairSalonGame({ onWin }: Props) {
     for (const obs of obstacles) {
       const inXRange = obs.x < 90 && obs.x + OBSTACLE_WIDTH > 60;
       const inYRange =
-        scissorY < obs.topHeight || scissorY > obs.topHeight + OBSTACLE_GAP;
+        scissorY + SCISSOR_HITBOX_OFFSET < obs.topHeight ||
+        scissorY - SCISSOR_HITBOX_OFFSET > obs.topHeight + OBSTACLE_GAP;
 
       if (inXRange && inYRange) {
         setGameOver(true);
@@ -129,6 +145,8 @@ export default function HairSalonGame({ onWin }: Props) {
       <Text style={styles.score}>Snips: {score}</Text>
 
       <View style={styles.gameArea}>
+        <Image source={background} style={StyleSheet.absoluteFill} />
+
         <TouchableOpacity
           onPress={flap}
           style={styles.touchArea}
@@ -136,42 +154,46 @@ export default function HairSalonGame({ onWin }: Props) {
         >
           {obstacles.map((obs, idx) => {
             const isCut = obs.cut;
-            const gapColor = isCut ? "transparent" : "#cda4f3";
 
             return (
               <React.Fragment key={idx}>
-                <View
+                <Image
+                  source={isCut ? topcut : healthyTop}
                   style={[
                     styles.obstacle,
                     {
-                      height: obs.topHeight,
+                      height: obs.topHeight + 20,
+                      top: -20,
                       left: obs.x,
-                      top: 0,
-                      backgroundColor: "#ffb6c1",
+                      resizeMode: "stretch",
                     },
                   ]}
                 />
-                <View
+                <Image
+                  source={isCut ? chopped : healthyEnd}
                   style={[
                     styles.obstacle,
                     {
-                      height: GAME_HEIGHT - obs.topHeight - OBSTACLE_GAP,
+                      height: GAME_HEIGHT - obs.topHeight - OBSTACLE_GAP + 20,
                       top: obs.topHeight + OBSTACLE_GAP,
                       left: obs.x,
-                      backgroundColor: "#ffb6c1",
+                      resizeMode: "stretch",
                     },
                   ]}
                 />
-                <View
-                  style={{
-                    position: "absolute",
-                    top: obs.topHeight,
-                    height: OBSTACLE_GAP,
-                    left: obs.x,
-                    width: OBSTACLE_WIDTH,
-                    backgroundColor: gapColor,
-                  }}
-                />
+                {!isCut && (
+                  <Image
+                    source={deadHair}
+                    style={{
+                      position: "absolute",
+                      top: obs.topHeight,
+                      height: OBSTACLE_GAP,
+                      left: obs.x - 1.5,
+                      width: OBSTACLE_WIDTH,
+                      resizeMode: "stretch",
+                    }}
+                  />
+                )}
               </React.Fragment>
             );
           })}
@@ -179,18 +201,27 @@ export default function HairSalonGame({ onWin }: Props) {
           <View
             style={{
               position: "absolute",
-              top: scissorY,
-              left: 60,
-              width: 30,
-              height: 30,
-              alignItems: "center",
-              justifyContent: "center",
+              top: scissorY + 5,
+              left: 65,
+              width: 20,
+              height: 20,
               borderWidth: 1,
-              borderColor: "#333",
-              borderRadius: 4,
+              borderColor: "gray",
+              justifyContent: "center",
+              alignItems: "center",
             }}
           >
-            <Text style={{ fontSize: 24 }}>✂️</Text>
+            <Image
+              source={scissorsImg}
+              style={{
+                width: 40,
+                height: 40,
+                resizeMode: "contain",
+                position: "absolute",
+                top: -10,
+                left: -10,
+              }}
+            />
           </View>
         </TouchableOpacity>
       </View>
@@ -217,7 +248,7 @@ const styles = StyleSheet.create({
   gameArea: {
     width: "90%",
     height: GAME_HEIGHT,
-    backgroundColor: "#d0f0eb",
+    backgroundColor: "transparent",
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",

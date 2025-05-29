@@ -1,6 +1,7 @@
 // Full updated RoomScreen.tsx
 import Anagram from "@/components/Anagram";
 import BakeryGame from "@/components/BakeryGame";
+import BoutiqueGame from "@/components/BoutiqueGame";
 import GamblingGame from "@/components/GamblingGame";
 import HairSalonGame from "@/components/HairSalonGame";
 import HangmanGame from "@/components/HangmanGame";
@@ -89,6 +90,7 @@ export default function RoomScreen() {
     "kelp-nursery",
     "hair-salon",
     "hat-store",
+    "fish-fashion",
   ].includes(room.id);
   const hasRiddle = !!riddle;
   const showChoice = hasMiniGame && hasRiddle && !chosenMode && !solved;
@@ -198,6 +200,9 @@ export default function RoomScreen() {
                 <HairSalonGame
                   onWin={() => handleGameWin("💇 Honey, you've got style!")}
                 />
+              )}
+              {room.id === "fish-fashion" && (
+                <BoutiqueGame onWin={() => handleGameWin("🧵 Fashion Icon!")} />
               )}
             </>
           )}
