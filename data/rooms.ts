@@ -9,6 +9,8 @@ export const rooms: Room[] = [
     color: "#fff",
     unlocked: true,
     image: require("@/assets/images/openUpShop.png"),
+    happyfish: "",
+    sadfish: "",
   },
   {
     id: "tarot",
@@ -16,6 +18,8 @@ export const rooms: Room[] = [
     color: "#FBE7C6",
     unlocked: true,
     image: require("@/assets/images/tarot.png"),
+    happyfish: require("@/assets/images/shopowners/happytarot.png"),
+    sadfish: require("@/assets/images/shopowners/sadtarot.png"),
   },
   {
     id: "fish-cafe",
@@ -23,6 +27,8 @@ export const rooms: Room[] = [
     color: "#B4F8C8",
     unlocked: true,
     image: require("@/assets/images/cafe.png"),
+    happyfish: require("@/assets/images/shopowners/happycafe.png"),
+    sadfish: require("@/assets/images/shopowners/sadcafe.png"),
   },
   {
     id: "gambling-den",
@@ -30,6 +36,8 @@ export const rooms: Room[] = [
     color: "#A0E7E5",
     unlocked: true,
     image: require("@/assets/images/gamblingDen.png"),
+    happyfish: require("@/assets/images/shopowners/happygamble.png"),
+    sadfish: require("@/assets/images/shopowners/sadgamble.png"),
   },
   {
     id: "bakery",
@@ -37,6 +45,8 @@ export const rooms: Room[] = [
     color: "#FFAEBC",
     unlocked: true,
     image: require("@/assets/images/bakery.png"),
+    happyfish: require("@/assets/images/shopowners/happybakery.png"),
+    sadfish: require("@/assets/images/shopowners/sadbakery.png"),
   },
   {
     id: "fish-pub",
@@ -44,6 +54,8 @@ export const rooms: Room[] = [
     color: "#E0BBE4",
     unlocked: true,
     image: require("@/assets/images/fishPub.png"),
+    happyfish: require("@/assets/images/shopowners/happypub.png"),
+    sadfish: require("@/assets/images/shopowners/sadpub.png"),
   },
   {
     id: "souvenir-shop",
@@ -51,6 +63,8 @@ export const rooms: Room[] = [
     color: "#FFDFD3",
     unlocked: true,
     image: require("@/assets/images/souvenir.png"),
+    happyfish: require("@/assets/images/shopowners/happysouvenir.png"),
+    sadfish: require("@/assets/images/shopowners/sadsouvenir.png"),
   },
   {
     id: "hat-store",
@@ -58,6 +72,8 @@ export const rooms: Room[] = [
     color: "#D0F4DE",
     unlocked: true,
     image: require("@/assets/images/hatShop.png"),
+    happyfish: require("@/assets/images/shopowners/happyhat.png"),
+    sadfish: require("@/assets/images/shopowners/sadhat.png"),
   },
   {
     id: "kelp-nursery",
@@ -65,6 +81,8 @@ export const rooms: Room[] = [
     color: "#B5EAD7",
     unlocked: true,
     image: require("@/assets/images/kelpNursery.png"),
+    happyfish: require("@/assets/images/shopowners/happykelp.png"),
+    sadfish: require("@/assets/images/shopowners/sadkelp.png"),
   },
   {
     id: "fish-fashion",
@@ -72,6 +90,8 @@ export const rooms: Room[] = [
     color: "#C7CEEA",
     unlocked: true,
     image: require("@/assets/images/fishBoutique.png"),
+    happyfish: require("@/assets/images/shopowners/happyboutique.png"),
+    sadfish: require("@/assets/images/shopowners/sadboutique.png"),
   },
   {
     id: "museum",
@@ -79,6 +99,8 @@ export const rooms: Room[] = [
     color: "#FFFACD",
     unlocked: true,
     image: require("@/assets/images/museum.png"),
+    happyfish: require("@/assets/images/shopowners/happymuseum.png"),
+    sadfish: require("@/assets/images/shopowners/sadmuseum.png"),
   },
   {
     id: "hair-salon",
@@ -86,6 +108,8 @@ export const rooms: Room[] = [
     color: "#FFC3A0",
     unlocked: true,
     image: require("@/assets/images/hairSalon.png"),
+    happyfish: require("@/assets/images/shopowners/happysalon.png"),
+    sadfish: require("@/assets/images/shopowners/sadsalon.png"),
   },
   {
     id: "stationary-shop",
@@ -93,5 +117,7 @@ export const rooms: Room[] = [
     color: "#AED9E0",
     unlocked: true,
     image: require("@/assets/images/stationary.png"),
+    happyfish: require("@/assets/images/shopowners/happystationery.png"),
+    sadfish: require("@/assets/images/shopowners/sadstationery.png"),
   },
 ];
