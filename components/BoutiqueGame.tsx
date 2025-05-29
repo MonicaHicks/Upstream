@@ -1,3 +1,5 @@
+import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
+import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
 import React, { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -6,12 +8,20 @@ const COLOR_NAMES = ["Red", "Yellow", "Green", "Blue"];
 const SEQUENCE_LENGTH = 5;
 const DISPLAY_TIME = 700;
 
-export default function BoutiqueGame({ onWin }) {
+type Props = {
+  onWin: () => void;
+  onFail: () => void;
+};
+
+export default function BoutiqueGame({ onWin, onFail }: Props) {
   const [sequence, setSequence] = useState<number[]>([]);
   const [playerInput, setPlayerInput] = useState<number[]>([]);
   const [showingIndex, setShowingIndex] = useState<number>(-1);
   const [inputEnabled, setInputEnabled] = useState(false);
   const [score, setScore] = useState(0);
+  let [fontsLoaded] = useFonts({
+    Cinzel_900Black,
+  });
 
   const playSequence = (newSeq: number[]) => {
     let i = 0;
@@ -112,11 +122,14 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 10,
+    fontFamily: "Cinzel_900Black",
     color: "#5c0036",
+    textAlign: "center",
   },
   subtext: {
     fontSize: 18,
     marginBottom: 20,
+    fontFamily: "Cinzel_900Black",
     color: "#5c0036",
   },
   grid: {
@@ -137,5 +150,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
+    fontFamily: "Cinzel_900Black",
   },
 });

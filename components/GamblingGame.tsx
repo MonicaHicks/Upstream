@@ -1,3 +1,5 @@
+import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
+import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
 import { useRef, useState } from "react";
 import {
   Animated,
@@ -23,7 +25,9 @@ export default function GamblingGame({ onWin, onFail }: Props) {
   const [currentRoll, setCurrentRoll] = useState<number | null>(null);
   const [rollCount, setRollCount] = useState(0);
   const [rolling, setRolling] = useState(false);
-
+  let [fontsLoaded] = useFonts({
+    Cinzel_900Black,
+  });
   const animation = useRef(new Animated.Value(0)).current;
 
   const rollDie = () => Math.floor(Math.random() * (5 - 2 + 1)) + 2;
@@ -175,6 +179,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 12,
     textAlign: "center",
+    fontFamily: "Cinzel_900Black",
   },
   row: { flexDirection: "row", justifyContent: "space-around" },
   button: {
@@ -183,10 +188,20 @@ const styles = StyleSheet.create({
     marginTop: 12,
     backgroundColor: "#222",
   },
-  buttonText: { color: "white", fontWeight: "bold", fontSize: 16 },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+    fontFamily: "Cinzel_900Black",
+  },
   results: { alignItems: "center", gap: 12 },
-  text: { fontSize: 16 },
+  text: { fontSize: 16, fontFamily: "Cinzel_900Black" },
   diceText: { fontSize: 55 },
-  rollingText: { fontSize: 75, marginTop: 12 },
-  resultText: { fontSize: 20, fontWeight: "bold", marginTop: 16 },
+  rollingText: { fontSize: 75, fontFamily: "Cinzel_900Black", marginTop: 12 },
+  resultText: {
+    fontSize: 20,
+    fontFamily: "Cinzel_900Black",
+    fontWeight: "bold",
+    marginTop: 16,
+  },
 });

@@ -68,7 +68,7 @@ export default function TarotGame({ onWin, onFail }: Props) {
         updated[second].matched = true;
         setCards(updated);
         setMatches(matches + 1);
-        setFeedback("✅ You found a match!");
+        setFeedback("You found a match!");
         setSelected([]);
         if (matches + 1 >= 3) onWin();
       } else {
@@ -83,8 +83,8 @@ export default function TarotGame({ onWin, onFail }: Props) {
         setAttemptsLeft(remaining);
         setFeedback(
           remaining > 0
-            ? `❌ No match. ${remaining} lives left.`
-            : "❌ You're out of readings!"
+            ? `No match. ${remaining} lives left.`
+            : "You're out of readings!"
         );
         if (remaining <= 0) {
           onFail();
@@ -123,7 +123,7 @@ export default function TarotGame({ onWin, onFail }: Props) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>🔮 Flip cards to find 3 matching pairs:</Text>
+      <Text style={styles.title}>Flip cards to find 3 matching pairs:</Text>
       {renderRows()}
       <Text style={styles.feedback}>{feedback}</Text>
     </ScrollView>
@@ -136,7 +136,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 20,
   },
-  title: { fontSize: 18, fontWeight: "bold", textAlign: "center" },
+  title: {
+    fontFamily: "Cinzel_900Black",
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
+  },
   row: {
     flexDirection: "row",
     justifyContent: "center",
