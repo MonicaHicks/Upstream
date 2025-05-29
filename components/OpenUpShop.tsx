@@ -80,7 +80,9 @@ export default function OpenUpShop({ onWin }: Props) {
       <Text style={{ fontFamily: "Cinzel_900Black", fontSize: 30 }}>
         Your clue is: {currentPlayer?.secretGoal?.clue}
       </Text>
-      <Text style={styles.title}>Select 3 rooms you think are your goal:</Text>
+      <Text style={styles.title}>
+        Select up to 3 rooms you think are in your goal:
+      </Text>
 
       <View
         style={{

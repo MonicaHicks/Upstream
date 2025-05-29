@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import GamePopupModal from "./GamePopUpModal";
 
 const CARD_IMAGES = [
   require("../assets/images/tarot/tarot-cross.jpeg"),
@@ -45,6 +46,8 @@ export default function TarotGame({ onWin, onFail }: Props) {
   const [matches, setMatches] = useState(0);
   const [attemptsLeft, setAttemptsLeft] = useState(5);
   const [feedback, setFeedback] = useState("");
+  const [showIntro, setShowIntro] = useState(true);
+  const [showRules, setShowRules] = useState(false);
 
   const handleFlip = (index: number) => {
     if (cards[index].flipped || selected.length === 2 || attemptsLeft === 0)
@@ -122,11 +125,30 @@ export default function TarotGame({ onWin, onFail }: Props) {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Flip cards to find 3 matching pairs:</Text>
-      {renderRows()}
-      <Text style={styles.feedback}>{feedback}</Text>
-    </ScrollView>
+    <>
+      <GamePopupModal
+        visible={showIntro}
+        imageSrc={require("../assets/images/shopowners/happytarot.png")}
+        message={"I am the tarot card fish"}
+        onClose={() => {
+          setShowIntro(false);
+          setShowRules(true);
+        }}
+      />
+      <GamePopupModal
+        visible={showRules}
+        imageSrc={require("../assets/images/shopowners/happytarot.png")}
+        message={"Find three pairs to reveal your destiny!"}
+        onClose={() => setShowRules(false)}
+      />
+      {!showIntro && !showRules && (
+        <ScrollView contentContainerStyle={styles.container}>
+          <Text style={styles.title}>Flip cards to find 3 matching pairs:</Text>
+          {renderRows()}
+          <Text style={styles.feedback}>{feedback}</Text>
+        </ScrollView>
+      )}{" "}
+    </>
   );
 }
 

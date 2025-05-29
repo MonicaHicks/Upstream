@@ -288,9 +288,12 @@ export default function RoomScreen() {
                   </Text>
                   <TouchableOpacity
                     style={styles.button}
-                    onPress={() => setShowResult(false)}
+                    onPress={() => {
+                      setShowResult(false);
+                      router.back();
+                    }}
                   >
-                    <Text style={styles.buttonText}>Back to Room</Text>
+                    <Text style={styles.buttonText}>Back to Map</Text>
                   </TouchableOpacity>
                 </View>
               </View>

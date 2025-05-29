@@ -113,8 +113,6 @@ export default function BakeryWordSearch({ onWin, onFail }: Props) {
   const [wordPositions, setWordPositions] = useState<Coord[][]>([]);
   const [showIntro, setShowIntro] = useState(true);
   const [showRules, setShowRules] = useState(false);
-  const [showResult, setShowResult] = useState(false);
-  const [won, setWon] = useState<boolean | null>(null);
 
   let [fontsLoaded] = useFonts({
     Cinzel_900Black,
@@ -134,9 +132,6 @@ export default function BakeryWordSearch({ onWin, onFail }: Props) {
 
   useEffect(() => {
     if (timeLeft <= 0) {
-      Alert.alert("⏰ Time's Up!", "You ran out of time!");
-      setWon(false);
-      setShowResult(true);
       onFail();
     } else {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
@@ -163,8 +158,6 @@ export default function BakeryWordSearch({ onWin, onFail }: Props) {
       setFound(newFound);
       setFoundCoords([...foundCoords, wordPositions[matchIndex]]);
       if (newFound.length === TARGET_WORD_COUNT) {
-        setWon(true);
-        setShowResult(true);
         onWin();
       }
     } else {
@@ -199,21 +192,7 @@ export default function BakeryWordSearch({ onWin, onFail }: Props) {
         onClose={() => setShowRules(false)}
       />
 
-      <GamePopupModal
-        visible={showResult}
-        imageSrc={
-          won
-            ? require("../assets/images/shopowners/happybakery.png")
-            : require("../assets/images/shopowners/sadbakery.png")
-        }
-        message={won ? "You did it! 🎉" : "Try again next time! 😢"}
-        buttonText="Back to Room"
-        onClose={() => {
-          setShowResult(false);
-        }}
-      />
-
-      {!showIntro && !showRules && !showResult && (
+      {!showIntro && !showRules && (
         <View style={styles.container}>
           <Text style={styles.timer}>Time Left: {timeLeft}s</Text>
           <Text style={styles.instructions}>
