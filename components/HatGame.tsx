@@ -1,3 +1,5 @@
+import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
+import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
 import React, { useState } from "react";
 import {
   Alert,
@@ -65,6 +67,9 @@ export default function HatGame({ onWin, onFail }: Props) {
   );
   const [score, setScore] = useState<number>(0);
   const [resolving, setResolving] = useState<boolean>(false);
+  let [fontsLoaded] = useFonts({
+    Cinzel_900Black,
+  });
 
   const handlePress = (row: number, col: number) => {
     if (resolving) return;
@@ -244,7 +249,7 @@ export default function HatGame({ onWin, onFail }: Props) {
 
 const styles = StyleSheet.create({
   container: { alignItems: "center", paddingTop: 40 },
-  score: { fontSize: 20, marginBottom: 10 },
+  score: { fontSize: 20, fontFamily: "Cinzel_900Black", marginBottom: 10 },
   grid: {
     width: GRID_SIZE * TILE_SIZE,
     flexDirection: "row",
@@ -275,5 +280,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontWeight: "bold",
+    fontFamily: "Cinzel_900Black",
   },
 });
