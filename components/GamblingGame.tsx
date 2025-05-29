@@ -10,11 +10,12 @@ import {
 
 type Props = {
   onWin: () => void;
+  onFail: () => void;
 };
 
 const dieEmojis = ["", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
 
-export default function GamblingGame({ onWin }: Props) {
+export default function GamblingGame({ onWin, onFail }: Props) {
   const [choice, setChoice] = useState<"high" | "low" | null>(null);
   const [target, setTarget] = useState<number | null>(null);
   const [rolls, setRolls] = useState<number[]>([]);
@@ -68,6 +69,7 @@ export default function GamblingGame({ onWin }: Props) {
           onWin();
         } else {
           setResult("lose");
+          onFail();
         }
       }
     }, 500);

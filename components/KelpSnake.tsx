@@ -16,8 +16,8 @@ const INITIAL_SNAKE = [
 ];
 const INITIAL_DIRECTION = { x: 1, y: 0 };
 
-function getRandomFood(snake) {
-  let newFood;
+function getRandomFood(snake: any) {
+  let newFood: any;
   while (true) {
     newFood = {
       x: Math.floor(Math.random() * GRID_SIZE),
@@ -25,7 +25,7 @@ function getRandomFood(snake) {
     };
     if (
       !snake.some(
-        (segment) => segment.x === newFood.x && segment.y === newFood.y
+        (segment: any) => segment.x === newFood.x && segment.y === newFood.y
       )
     ) {
       return newFood;
@@ -35,9 +35,10 @@ function getRandomFood(snake) {
 
 type Props = {
   onWin: () => void;
+  onFail: () => void;
 };
 
-export default function KelpSnake({ onWin }: Props) {
+export default function KelpSnake({ onWin, onFail }: Props) {
   const [snake, setSnake] = useState(INITIAL_SNAKE);
   const [direction, setDirection] = useState(INITIAL_DIRECTION);
   const [food, setFood] = useState(getRandomFood(INITIAL_SNAKE));
@@ -84,6 +85,7 @@ export default function KelpSnake({ onWin }: Props) {
           prevSnake.some((seg) => seg.x === newHead.x && seg.y === newHead.y)
         ) {
           setGameOver(true);
+          onFail();
           return prevSnake;
         }
 

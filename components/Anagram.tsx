@@ -24,9 +24,10 @@ function getRandomSubset<T>(arr: T[], n: number): T[] {
 
 type Props = {
   onWin: () => void;
+  onFail: () => void;
 };
 
-export default function AnagramGame({ onWin }: Props) {
+export default function AnagramGame({ onWin, onFail }: Props) {
   const [step, setStep] = useState<"intro" | "game" | "done">("intro");
   const [inputs, setInputs] = useState(["", ""]);
   const [timeLeft, setTimeLeft] = useState(25);
@@ -65,6 +66,7 @@ export default function AnagramGame({ onWin }: Props) {
       onWin();
     } else {
       setStep("done");
+      onFail();
     }
   };
 

@@ -1,11 +1,13 @@
 import { useGame } from "@/context/GameContext";
 import { clueSets } from "@/data/clues";
+import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
+import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+
 import {
   FlatList,
-  Image,
-  ImageStyle,
+  ImageBackground,
   Modal,
   StyleSheet,
   Text,
@@ -53,34 +55,69 @@ export default function PlayerSetupScreen() {
       router.replace("/");
     });
   };
+  let [fontsLoaded] = useFonts({
+    Cinzel_900Black,
+  });
 
   return (
-    <View style={styles.container}>
-      <View style={{ alignItems: "center" }}>
-        <View style={styles.imageBackground}>
-          <Image
-            source={require("../assets/images/UpstreamLogo.png")}
-            style={styles.logo}
-          />
-        </View>
+    <ImageBackground
+      source={require("../assets/images/Background.png")}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <Text
+        style={{
+          fontFamily: "Cinzel_900Black",
+          fontSize: 70,
+          color: "goldenrod",
+          textAlign: "center",
+          textShadowColor: "black",
+          textShadowOffset: { width: 5, height: 5 },
+          textShadowRadius: 10,
+          marginTop: 200,
+        }}
+      >
+        Upstream
+      </Text>
+      <View style={styles.overlay}>
+        <Text
+          style={{
+            color: "white",
+            fontWeight: "bold",
+            fontFamily: "Cinzel_900Black",
+            fontSize: 30,
+            textAlign: "center",
+          }}
+        >
+          Enter Player Names
+        </Text>
+        <FlatList
+          data={playerNames}
+          keyExtractor={(_, i) => i.toString()}
+          renderItem={({ item, index }) => (
+            <TextInput
+              style={styles.input}
+              placeholder={`Player ${index + 1}`}
+              placeholderTextColor="#000"
+              value={item}
+              onChangeText={(text) => handleNameChange(index, text)}
+            />
+          )}
+        />
+        <TouchableOpacity style={styles.button} onPress={handleStartGame}>
+          <Text
+            style={{
+              color: "white",
+              fontWeight: "bold",
+              fontFamily: "Cinzel_900Black",
+              fontSize: 30,
+              textAlign: "center",
+            }}
+          >
+            Start Game
+          </Text>
+        </TouchableOpacity>
       </View>
-      <Text style={styles.title}>Enter Player Names</Text>
-      <FlatList
-        data={playerNames}
-        keyExtractor={(_, i) => i.toString()}
-        renderItem={({ item, index }) => (
-          <TextInput
-            style={styles.input}
-            placeholder={`Player ${index + 1}`}
-            placeholderTextColor="#aaa"
-            value={item}
-            onChangeText={(text) => handleNameChange(index, text)}
-          />
-        )}
-      />
-      <TouchableOpacity style={styles.button} onPress={handleStartGame}>
-        <Text style={styles.buttonText}>Start Game</Text>
-      </TouchableOpacity>
 
       <Modal visible={showModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
@@ -90,7 +127,7 @@ export default function PlayerSetupScreen() {
                 {line}
               </Text>
             ))}
-            <Text style={styles.popup}> Enter at least 2 players</Text>
+            <Text style={styles.popup}>Enter at least 2 players</Text>
             <TouchableOpacity
               onPress={handleContinue}
               style={[styles.button, { marginTop: 20 }]}
@@ -100,67 +137,62 @@ export default function PlayerSetupScreen() {
           </View>
         </View>
       </Modal>
-    </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+  overlay: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    height: "60%",
+    backgroundColor: "rgba(0,0,0,0.4)",
     padding: 24,
     justifyContent: "center",
-    gap: 16,
   },
   title: {
     color: "white",
     fontSize: 32,
     fontWeight: "bold",
     textAlign: "center",
-    marginTop: 40,
+    fontFamily: "Cinzel_900Black",
     marginBottom: 20,
   },
-  logo: {
-    width: 200,
-    height: 200,
-    resizeMode: "contain", // ✅ for Image
-  } as ImageStyle,
-  imageBackground: {
-    width: 190,
-    height: 190,
-    borderRadius: 95,
-    backgroundColor: "#90D5FF",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  header: {
-    fontWeight: "bold",
-    textAlign: "center",
-    color: "white",
-    marginTop: 20,
-    fontSize: 40,
-  },
   input: {
-    color: "white",
+    color: "#000",
     fontSize: 20,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
     padding: 12,
     marginVertical: 6,
+    backgroundColor: "rgba(255,255,255,0.4)",
+    fontWeight: "bold",
+    fontFamily: "Cinzel_900Black",
   },
   button: {
     backgroundColor: "#000080",
     padding: 14,
     borderRadius: 8,
-  },
-  popup: {
-    fontSize: 25,
-    color: "#000",
+    marginTop: 10,
   },
   buttonText: {
     color: "white",
     fontSize: 25,
+    fontFamily: "Cinzel_900Black",
     fontWeight: "bold",
+    textAlign: "center",
+  },
+  popup: {
+    fontSize: 25,
+    fontFamily: "Cinzel_900Black",
+    color: "#000",
     textAlign: "center",
   },
   modalOverlay: {
@@ -180,6 +212,7 @@ const styles = StyleSheet.create({
   },
   clueText: {
     fontSize: 16,
+    fontFamily: "Cinzel_900Black",
     marginBottom: 8,
     textAlign: "center",
   },

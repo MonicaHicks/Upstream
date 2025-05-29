@@ -55,9 +55,10 @@ const cloneGrid = (grid: GridType): GridType => grid.map((row) => [...row]);
 
 type Props = {
   onWin: () => void;
+  onFail: () => void;
 };
 
-export default function HatGame({ onWin }: Props) {
+export default function HatGame({ onWin, onFail }: Props) {
   const [grid, setGrid] = useState<GridType>(generateSafeGrid);
   const [selected, setSelected] = useState<{ row: number; col: number } | null>(
     null
@@ -206,6 +207,7 @@ export default function HatGame({ onWin }: Props) {
 
   const giveUp = () => {
     Alert.alert("Game Over", `Your final score: ${score}`);
+    onFail();
   };
 
   return (

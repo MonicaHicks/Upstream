@@ -1,3 +1,5 @@
+import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
+import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -10,6 +12,7 @@ import {
 
 interface Props {
   onWin: () => void;
+  onFail: () => void;
 }
 
 const GRID_SIZE = 8;
@@ -19,6 +22,8 @@ const WORD_BANK = [
   "PASTRY",
   "ROLL",
   "MUFFIN",
+  "COOKIE",
+  "FLOUR",
   "TART",
   "BAGEL",
   "BUN",
@@ -26,7 +31,7 @@ const WORD_BANK = [
   "SUGAR",
 ];
 const TARGET_WORD_COUNT = 5;
-const TIMER_SECONDS = 30;
+const TIMER_SECONDS = 60;
 
 type Coord = { row: number; col: number };
 
@@ -97,7 +102,7 @@ function generateGrid(
   return grid;
 }
 
-export default function BakeryWordSearch({ onWin }: Props) {
+export default function BakeryWordSearch({ onWin, onFail }: Props) {
   const [grid, setGrid] = useState<string[][]>([]);
   const [selected, setSelected] = useState<Coord[]>([]);
   const [found, setFound] = useState<string[]>([]);
@@ -105,6 +110,9 @@ export default function BakeryWordSearch({ onWin }: Props) {
   const [targetWords, setTargetWords] = useState<string[]>([]);
   const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS);
   const [wordPositions, setWordPositions] = useState<Coord[][]>([]);
+  let [fontsLoaded] = useFonts({
+    Cinzel_900Black,
+  });
 
   useEffect(() => {
     const chosenWords = WORD_BANK.sort(() => 0.5 - Math.random()).slice(
@@ -121,6 +129,7 @@ export default function BakeryWordSearch({ onWin }: Props) {
   useEffect(() => {
     if (timeLeft <= 0) {
       Alert.alert("⏰ Time's Up!", "You ran out of time!");
+      onFail();
     } else {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
@@ -161,7 +170,6 @@ export default function BakeryWordSearch({ onWin }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🔤 Bakery Word Search</Text>
       <Text style={styles.timer}>Time Left: {timeLeft}s</Text>
       <Text style={styles.instructions}>
         {TARGET_WORD_COUNT - found.length} words left
@@ -185,16 +193,20 @@ export default function BakeryWordSearch({ onWin }: Props) {
           </View>
         ))}
       </View>
-      <TouchableOpacity onPress={checkSelection} style={styles.submitButton}>
-        <Text style={styles.submitText}>Submit Word</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => Alert.alert("Hint", "Words: " + targetWords.join(", "))}
-        style={styles.hintButton}
-      >
-        <Text style={styles.hintText}>Hint</Text>
-      </TouchableOpacity>
       <Text style={styles.foundText}>Found: {found.join(", ")}</Text>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={checkSelection} style={styles.submitButton}>
+          <Text style={styles.submitText}>Submit Word</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            Alert.alert("Hint", "Words: " + targetWords.join(", "))
+          }
+          style={styles.hintButton}
+        >
+          <Text style={styles.hintText}>Hint</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -206,9 +218,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 20,
   },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 10 },
-  timer: { fontSize: 18, color: "#b22222", marginBottom: 5 },
-  instructions: { fontSize: 16, marginBottom: 10 },
+  title: {
+    fontFamily: "Cinzel_900Black",
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  timer: {
+    fontFamily: "Cinzel_900Black",
+    fontSize: 25,
+    color: "#b22222",
+    marginBottom: 5,
+  },
+  instructions: {
+    fontFamily: "Cinzel_900Black",
+    fontSize: 16,
+    marginBottom: 10,
+  },
   gridContainer: { marginBottom: 20 },
   row: { flexDirection: "row" },
   cell: {
@@ -227,24 +253,38 @@ const styles = StyleSheet.create({
   foundCell: {
     backgroundColor: "#90ee90",
   },
-  cellText: { fontSize: 20, fontWeight: "bold" },
+  cellText: { fontFamily: "Cinzel_900Black", fontSize: 20, fontWeight: "bold" },
   submitButton: {
     backgroundColor: "#6b4226",
-    padding: 14,
+    padding: 10,
     borderRadius: 8,
     marginTop: 10,
+    fontFamily: "Cinzel_900Black",
   },
-  submitText: { color: "white", fontWeight: "bold", fontSize: 16 },
+  submitText: {
+    fontFamily: "Cinzel_900Black",
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
   hintButton: {
     backgroundColor: "#d4a373",
     padding: 10,
     borderRadius: 8,
     marginTop: 10,
+    width: "40%",
   },
   hintText: {
     color: "black",
     fontWeight: "bold",
     fontSize: 16,
+    fontFamily: "Cinzel_900Black",
+    textAlign: "center",
   },
-  foundText: { fontSize: 16, marginTop: 10 },
+  buttonContainer: {
+    flex: 1,
+    flexDirection: "row",
+    gap: 10,
+  },
+  foundText: { fontFamily: "Cinzel_900Black", fontSize: 16, marginTop: 10 },
 });

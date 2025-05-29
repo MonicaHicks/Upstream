@@ -1,11 +1,14 @@
+import RoomIcon from "@/components/RoomIcon";
 import { useGame } from "@/context/GameContext";
 import { Player, Room } from "@/types/types";
+import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
+import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  FlatList,
-  Image,
+  ImageBackground,
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -19,6 +22,10 @@ export default function HomeScreen() {
   const [showModal, setShowModal] = useState(false);
   const router = useRouter();
 
+  let [fontsLoaded] = useFonts({
+    Cinzel_900Black,
+  });
+
   const handleRoomPress = (room: Room) => {
     if (!room.unlocked) return;
     setSelectedRoom(room);
@@ -31,63 +38,80 @@ export default function HomeScreen() {
     router.push(`/room/${selectedRoom?.id}` as any);
   };
 
-  // Temporary screen while redirecting
+  // If players aren't set up yet, show setup screen
   if (players.length === 0) {
-    return (
-      <View style={styles.container}>
-        <PlayerSetupScreen />
-      </View>
-    );
+    return <PlayerSetupScreen />;
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Upstream</Text>
-      <FlatList
-        data={rooms}
-        numColumns={2}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[styles.roomCard, { opacity: item.unlocked ? 1 : 0.4 }]}
-            onPress={() => handleRoomPress(item)}
-            disabled={!item.unlocked}
-          >
-            <Image source={item.image} style={styles.roomImage} />
-            <Text style={styles.roomText}>{item.name}</Text>
-          </TouchableOpacity>
-        )}
-      />
+    <ImageBackground
+      source={require("../assets/images/Background.png")}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <Text
+        style={{
+          fontFamily: "Cinzel_900Black",
+          fontSize: 50,
+          color: "goldenrod",
+          textAlign: "center",
+          textShadowColor: "black",
+          textShadowOffset: { width: 5, height: 5 },
+          textShadowRadius: 10,
+          marginTop: 50,
+        }}
+      >
+        Upstream
+      </Text>
 
-      <Modal visible={showModal} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Who’s solving this room?</Text>
-            {players.map((player) => (
-              <TouchableOpacity
-                key={player.id}
-                style={[styles.playerButton, { backgroundColor: player.color }]}
-                onPress={() => handlePlayerSelect(player)}
-              >
-                <Text style={styles.playerText}>{player.name}</Text>
+      <ScrollView contentContainerStyle={styles.snakeContainer}>
+        {rooms.map((item, index) => {
+          const alignLeft = index % 2 === 0;
+          return (
+            <View
+              key={item.id}
+              style={[
+                styles.snakeRow,
+                { justifyContent: alignLeft ? "flex-start" : "flex-end" },
+              ]}
+            >
+              <RoomIcon item={item} handleRoomPress={handleRoomPress} />
+            </View>
+          );
+        })}
+
+        <Modal visible={showModal} transparent animationType="slide">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Who’s solving this room?</Text>
+              {players.map((player) => (
+                <TouchableOpacity
+                  key={player.id}
+                  style={[
+                    styles.playerButton,
+                    { backgroundColor: player.color },
+                  ]}
+                  onPress={() => handlePlayerSelect(player)}
+                >
+                  <Text style={styles.playerText}>{player.name}</Text>
+                </TouchableOpacity>
+              ))}
+              <TouchableOpacity onPress={() => setShowModal(false)}>
+                <Text style={styles.cancel}>Cancel</Text>
               </TouchableOpacity>
-            ))}
-            <TouchableOpacity onPress={() => setShowModal(false)}>
-              <Text style={styles.cancel}>Cancel</Text>
-            </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+      </ScrollView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
-    padding: 24,
-    paddingTop: 60,
-    backgroundColor: "#174873",
+    width: "100%",
+    height: "100%",
   },
   header: {
     fontSize: 32,
@@ -95,30 +119,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     textAlign: "center",
     color: "white",
-  },
-  roomCard: {
-    flex: 1,
-    margin: 8,
-    height: 150,
-    borderRadius: 16,
-    overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "flex-end",
-  },
-  roomImage: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 16,
-    opacity: 0.8,
-    resizeMode: "cover",
-  },
-  roomText: {
-    fontWeight: "bold",
-    fontSize: 18,
-    color: "white",
-    backgroundColor: "rgba(0,0,0,0.4)",
-    width: "100%",
-    textAlign: "center",
-    paddingVertical: 8,
+    fontFamily: "Cinzel_900Black",
   },
   modalOverlay: {
     flex: 1,
@@ -137,6 +138,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 16,
+    fontFamily: "Cinzel_900Black",
+    textAlign: "center",
   },
   playerButton: {
     padding: 12,
@@ -149,9 +152,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "black",
     fontSize: 16,
+    fontFamily: "Cinzel_900Black",
   },
   cancel: {
     marginTop: 12,
     color: "#888",
+    fontFamily: "Cinzel_900Black",
+  },
+  snakeContainer: {
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    paddingBottom: 80,
+  },
+  snakeRow: {
+    flexDirection: "row",
+    marginBottom: 0,
   },
 });

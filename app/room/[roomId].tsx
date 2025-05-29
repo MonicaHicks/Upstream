@@ -10,6 +10,8 @@ import KelpSnake from "@/components/KelpSnake";
 import MuseumGame from "@/components/MuseumGame";
 import OpenUpShop from "@/components/OpenUpShop";
 import TarotGame from "@/components/TarotGame";
+import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
+import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
 
 import { useGame } from "@/context/GameContext";
 import { roomRiddlesWithAnswers } from "@/data/roomRiddlesWithAnswers";
@@ -29,17 +31,19 @@ import {
 
 export default function RoomScreen() {
   const { roomId } = useLocalSearchParams<{ roomId: string }>();
-  const { rooms, currentPlayer, markRoomVisited, markChallengeSolved } =
-    useGame();
+  const {
+    rooms,
+    currentPlayer,
+    markRoomVisited,
+    markChallengeSolved,
+    getAttemptsForRoom,
+    incrementAttemptsForRoom,
+  } = useGame();
   const router = useRouter();
   const [randomIndex, setRandomIndex] = useState(0);
-
-  useEffect(() => {
-    if (riddles && riddles.length > 0) {
-      const index = Math.floor(Math.random() * riddles.length);
-      setRandomIndex(index);
-    }
-  }, [roomId]); // ← reroll when roomId changes
+  let [fontsLoaded] = useFonts({
+    Cinzel_900Black,
+  });
 
   const room = rooms.find((r) => r.id === roomId);
   const riddles =
@@ -92,8 +96,24 @@ export default function RoomScreen() {
     "hat-store",
     "fish-fashion",
   ].includes(room.id);
+
   const hasRiddle = !!riddle;
-  const showChoice = hasMiniGame && hasRiddle && !chosenMode && !solved;
+  const attempts = getAttemptsForRoom(currentPlayer.id, room.id);
+  const showChoice =
+    hasMiniGame && hasRiddle && !solved && attempts < 2 && !chosenMode;
+  useEffect(() => {
+    if (!hasMiniGame && hasRiddle) {
+      setChosenMode("riddle");
+    } else if (hasMiniGame && (!hasRiddle || attempts < 2)) {
+      setChosenMode("game");
+    } else if (hasMiniGame && hasRiddle && attempts >= 2) {
+      setChosenMode("riddle");
+    }
+    if (riddles && riddles.length > 0) {
+      const index = Math.floor(Math.random() * riddles.length);
+      setRandomIndex(index);
+    }
+  }, [roomId, attempts]);
 
   return (
     <ImageBackground
@@ -118,6 +138,7 @@ export default function RoomScreen() {
                       fontSize: 24,
                       marginBottom: 16,
                       textAlign: "center",
+                      fontFamily: "Cinzel_900Black",
                     }}
                   >
                     How do you want to play this room?
@@ -162,13 +183,28 @@ export default function RoomScreen() {
           {((!solved && chosenMode === "game") || !hasRiddle) && (
             <>
               {room.id === "gambling-den" && (
-                <GamblingGame onWin={() => handleGameWin("🎲 Gambling Ace!")} />
+                <GamblingGame
+                  onWin={() => handleGameWin("🎲 Gambling Ace!")}
+                  onFail={() =>
+                    incrementAttemptsForRoom(currentPlayer.id, room.id)
+                  }
+                />
               )}
               {room.id === "bakery" && (
-                <BakeryGame onWin={() => handleGameWin("🥖 Pro Baker!")} />
+                <BakeryGame
+                  onWin={() => handleGameWin("🥖 Pro Baker!")}
+                  onFail={() =>
+                    incrementAttemptsForRoom(currentPlayer.id, room.id)
+                  }
+                />
               )}
               {room.id === "tarot" && (
-                <TarotGame onWin={() => handleGameWin("🔮 Tarot Master!")} />
+                <TarotGame
+                  onWin={() => handleGameWin("🔮 Tarot Master!")}
+                  onFail={() =>
+                    incrementAttemptsForRoom(currentPlayer.id, room.id)
+                  }
+                />
               )}
               {room.id === "open-up-shop" && (
                 <OpenUpShop
@@ -178,6 +214,9 @@ export default function RoomScreen() {
               {room.id === "stationary-shop" && (
                 <HangmanGame
                   onWin={() => handleGameWin("🖊️ Stationery Star!")}
+                  onFail={() =>
+                    incrementAttemptsForRoom(currentPlayer.id, room.id)
+                  }
                 />
               )}
               {room.id === "fish-pub" && (
@@ -185,20 +224,41 @@ export default function RoomScreen() {
                   onWin={() =>
                     handleGameWin("🍻 You’re not too drunk to read!")
                   }
+                  onFail={() =>
+                    incrementAttemptsForRoom(currentPlayer.id, room.id)
+                  }
                 />
               )}
               {room.id === "museum" && (
-                <MuseumGame onWin={() => handleGameWin("🦴 Fossil Finder!")} />
+                <MuseumGame
+                  onWin={() => handleGameWin("🦴 Fossil Finder!")}
+                  onFail={() =>
+                    incrementAttemptsForRoom(currentPlayer.id, room.id)
+                  }
+                />
               )}
               {room.id === "hat-store" && (
-                <HatGame onWin={() => handleGameWin("Hat Master!")} />
+                <HatGame
+                  onWin={() => handleGameWin("Hat Master!")}
+                  onFail={() =>
+                    incrementAttemptsForRoom(currentPlayer.id, room.id)
+                  }
+                />
               )}
               {room.id === "kelp-nursery" && (
-                <KelpSnake onWin={() => handleGameWin("🌿 Green Thumb!")} />
+                <KelpSnake
+                  onWin={() => handleGameWin("🌿 Green Thumb!")}
+                  onFail={() =>
+                    incrementAttemptsForRoom(currentPlayer.id, room.id)
+                  }
+                />
               )}
               {room.id === "hair-salon" && (
                 <HairSalonGame
                   onWin={() => handleGameWin("💇 Honey, you've got style!")}
+                  onFail={() =>
+                    incrementAttemptsForRoom(currentPlayer.id, room.id)
+                  }
                 />
               )}
               {room.id === "fish-fashion" && (
@@ -228,13 +288,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     color: "white",
-    marginTop: 50,
+    fontFamily: "Cinzel_900Black",
   },
   subtext: {
-    fontSize: 30,
+    fontSize: 28,
     textAlign: "center",
     marginBottom: 24,
     color: "white",
+    fontFamily: "Cinzel_900Black",
   },
   riddleBox: {
     backgroundColor: "#fff",
@@ -242,13 +303,19 @@ const styles = StyleSheet.create({
     padding: 20,
     elevation: 2,
   },
-  riddleText: { fontSize: 18, marginBottom: 16, textAlign: "center" },
+  riddleText: {
+    fontFamily: "Cinzel_900Black",
+    fontSize: 18,
+    marginBottom: 16,
+    textAlign: "center",
+  },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     padding: 12,
     borderRadius: 8,
     marginBottom: 12,
+    fontFamily: "Cinzel_900Black",
   },
   button: {
     backgroundColor: "#222",
@@ -261,8 +328,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold",
     fontSize: 18,
+    fontFamily: "Cinzel_900Black",
   },
-  feedback: { marginTop: 12, fontSize: 16, textAlign: "center" },
+  feedback: {
+    marginTop: 12,
+    fontFamily: "Cinzel_900Black",
+    fontSize: 16,
+    textAlign: "center",
+  },
   background: {
     flex: 1,
     justifyContent: "center",
