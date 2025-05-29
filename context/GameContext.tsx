@@ -1,5 +1,4 @@
 // context/GameContext.tsx
-
 import { players as initialPlayers } from "@/data/players";
 import { rooms as initialRooms } from "@/data/rooms";
 import { Player, Room } from "@/types/types";
@@ -15,6 +14,9 @@ type GameContextType = {
   selectPlayer: (id: string) => void;
   markRoomVisited: (roomId: string) => void;
   markChallengeSolved: (roomId: string) => void;
+  getAttemptsForRoom: (playerId: string, roomId: string) => number;
+  incrementAttemptsForRoom: (playerId: string, roomId: string) => void;
+  resetGame: () => void;
 };
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -23,10 +25,32 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
   const [players, setPlayers] = useState<Player[]>(initialPlayers);
   const [rooms, setRooms] = useState<Room[]>(initialRooms);
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+  const [gameAttempts, setGameAttempts] = useState<{
+    [playerId: string]: { [roomId: string]: number };
+  }>({});
 
   const selectPlayer = (id: string) => {
     const player = players.find((p) => p.id === id) || null;
     setCurrentPlayer(player);
+  };
+
+  const resetGame = () => {
+    setPlayers(
+      initialPlayers.map((p) => ({
+        ...p,
+        roomsVisited: [],
+        challengesSolved: [],
+        secretGoal: null,
+      }))
+    );
+    setRooms(
+      initialRooms.map((r) => ({
+        ...r,
+        unlocked: false,
+      }))
+    );
+    setGameAttempts({});
+    setCurrentPlayer(null);
   };
 
   const markRoomVisited = (roomId: string) => {
@@ -72,6 +96,23 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
     );
   };
 
+  const incrementAttemptsForRoom = (playerId: string, roomId: string) => {
+    setGameAttempts((prev) => {
+      const current = prev[playerId]?.[roomId] ?? 0;
+      return {
+        ...prev,
+        [playerId]: {
+          ...prev[playerId],
+          [roomId]: current + 1,
+        },
+      };
+    });
+  };
+
+  const getAttemptsForRoom = (playerId: string, roomId: string) => {
+    return gameAttempts[playerId]?.[roomId] ?? 0;
+  };
+
   return (
     <GameContext.Provider
       value={{
@@ -82,6 +123,9 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
         selectPlayer,
         markRoomVisited,
         markChallengeSolved,
+        getAttemptsForRoom,
+        incrementAttemptsForRoom,
+        resetGame,
       }}
     >
       {children}

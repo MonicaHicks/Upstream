@@ -6,10 +6,7 @@ export type Player = {
   color: string;
   roomsVisited: string[];
   challengesSolved: string[];
-  secretGoal: {
-    clue: string;
-    rooms: string[];
-  };
+  secretGoal: { clue: string; rooms: string[] } | null; // allow null
 };
 
 export type Room = {

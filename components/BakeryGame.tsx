@@ -19,6 +19,8 @@ const WORD_BANK = [
   "PASTRY",
   "ROLL",
   "MUFFIN",
+  "COOKIE",
+  "FLOUR",
   "TART",
   "BAGEL",
   "BUN",
@@ -26,7 +28,7 @@ const WORD_BANK = [
   "SUGAR",
 ];
 const TARGET_WORD_COUNT = 5;
-const TIMER_SECONDS = 30;
+const TIMER_SECONDS = 60;
 
 type Coord = { row: number; col: number };
 
@@ -161,7 +163,6 @@ export default function BakeryWordSearch({ onWin }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🔤 Bakery Word Search</Text>
       <Text style={styles.timer}>Time Left: {timeLeft}s</Text>
       <Text style={styles.instructions}>
         {TARGET_WORD_COUNT - found.length} words left

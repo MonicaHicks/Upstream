@@ -1,11 +1,12 @@
+import RoomIcon from "@/components/RoomIcon";
 import { useGame } from "@/context/GameContext";
 import { Player, Room } from "@/types/types";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  FlatList,
-  Image,
+  ImageBackground,
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -25,39 +26,60 @@ export default function HomeScreen() {
     setShowModal(true);
   };
 
+  const chunkArray = (arr: Room[], size: number) => {
+    return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+      arr.slice(i * size, i * size + size)
+    );
+  };
+
   const handlePlayerSelect = (player: Player) => {
     selectPlayer(player.id);
     setShowModal(false);
     router.push(`/room/${selectedRoom?.id}` as any);
   };
 
-  // Temporary screen while redirecting
+  // If players aren't set up yet, show setup screen
   if (players.length === 0) {
-    return (
-      <View style={styles.container}>
-        <PlayerSetupScreen />
-      </View>
-    );
+    return <PlayerSetupScreen />;
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Upstream</Text>
-      <FlatList
-        data={rooms}
-        numColumns={2}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[styles.roomCard, { opacity: item.unlocked ? 1 : 0.4 }]}
-            onPress={() => handleRoomPress(item)}
-            disabled={!item.unlocked}
-          >
-            <Image source={item.image} style={styles.roomImage} />
-            <Text style={styles.roomText}>{item.name}</Text>
-          </TouchableOpacity>
-        )}
-      />
+    <ImageBackground
+      source={require("../assets/images/Background.png")}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <Text
+        style={{
+          fontFamily: "Cinzel_900Black",
+          fontSize: 50,
+          color: "goldenrod",
+          textAlign: "center",
+          textShadowColor: "black",
+          textShadowOffset: { width: 5, height: 5 },
+          textShadowRadius: 10,
+          marginTop: 50,
+        }}
+      >
+        Upstream
+      </Text>
+
+      <ScrollView contentContainerStyle={styles.snakeContainer}>
+        {rooms.map((item, index) => {
+          const alignLeft = index % 2 === 0;
+          return (
+            <View
+              key={item.id}
+              style={[
+                styles.snakeRow,
+                { justifyContent: alignLeft ? "flex-start" : "flex-end" },
+              ]}
+            >
+              <RoomIcon item={item} handleRoomPress={handleRoomPress} />
+            </View>
+          );
+        })}
+      </ScrollView>
 
       <Modal visible={showModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
@@ -78,16 +100,15 @@ export default function HomeScreen() {
           </View>
         </View>
       </Modal>
-    </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
-    padding: 24,
-    paddingTop: 60,
-    backgroundColor: "#174873",
+    width: "100%",
+    height: "100%",
   },
   header: {
     fontSize: 32,
@@ -99,7 +120,8 @@ const styles = StyleSheet.create({
   roomCard: {
     flex: 1,
     margin: 8,
-    height: 150,
+    height: "50%",
+    width: "20%",
     borderRadius: 16,
     overflow: "hidden",
     alignItems: "center",
@@ -110,13 +132,14 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     opacity: 0.8,
     resizeMode: "cover",
+    width: "20%",
   },
   roomText: {
     fontWeight: "bold",
     fontSize: 18,
     color: "white",
     backgroundColor: "rgba(0,0,0,0.4)",
-    width: "100%",
+    width: "20%",
     textAlign: "center",
     paddingVertical: 8,
   },
@@ -153,5 +176,14 @@ const styles = StyleSheet.create({
   cancel: {
     marginTop: 12,
     color: "#888",
+  },
+  snakeContainer: {
+    height: "5%",
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+  },
+  snakeRow: {
+    flexDirection: "row",
+    marginBottom: 0,
   },
 });

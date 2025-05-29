@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
-  FlatList,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -19,7 +19,7 @@ const CARD_BACK_IMAGE = require("../assets/images/tarot/tarot-back.jpeg");
 
 function shuffleCards(): {
   id: number;
-  symbol: string;
+  symbol: any;
   matched: boolean;
   flipped: boolean;
 }[] {
@@ -52,8 +52,7 @@ export default function TarotGame({ onWin }: Props) {
     const newCards = [...cards];
     newCards[index].flipped = true;
     setCards(newCards);
-    const newSelected = [...selected, index];
-    setSelected(newSelected);
+    setSelected([...selected, index]);
   };
 
   useEffect(() => {
@@ -68,7 +67,7 @@ export default function TarotGame({ onWin }: Props) {
         updated[second].matched = true;
         setCards(updated);
         setMatches(matches + 1);
-        setFeedback("\u2705 You found a match!");
+        setFeedback("✅ You found a match!");
         setSelected([]);
         if (matches + 1 >= 3) onWin();
       } else {
@@ -83,62 +82,67 @@ export default function TarotGame({ onWin }: Props) {
         setAttemptsLeft(remaining);
         setFeedback(
           remaining > 0
-            ? `\u274C No match. ${remaining} lives left.`
-            : "\u274C You're out of readings!"
+            ? `❌ No match. ${remaining} lives left.`
+            : "❌ You're out of readings!"
         );
       }
     }
   }, [selected]);
 
-  const renderCard = ({ item, index }: { item: any; index: number }) => (
+  const renderCard = (card: any, index: number) => (
     <TouchableOpacity
-      style={[
-        styles.card,
-        item.flipped || item.matched ? styles.card : styles.card,
-      ]}
+      key={card.id}
+      style={styles.card}
       onPress={() => handleFlip(index)}
-      disabled={item.flipped || item.matched}
+      disabled={card.flipped || card.matched}
     >
-      {item.flipped || item.matched ? (
-        <Image source={item.symbol} style={styles.card} resizeMode="contain" />
-      ) : (
-        <Image
-          source={CARD_BACK_IMAGE}
-          style={styles.card}
-          resizeMode="contain"
-        />
-      )}
+      <Image
+        source={card.flipped || card.matched ? card.symbol : CARD_BACK_IMAGE}
+        style={styles.card}
+        resizeMode="contain"
+      />
     </TouchableOpacity>
   );
 
+  const renderRows = () => {
+    const rows = [];
+    for (let i = 0; i < cards.length; i += 3) {
+      const rowCards = cards.slice(i, i + 3);
+      rows.push(
+        <View style={styles.row} key={`row-${i}`}>
+          {rowCards.map((card, index) => renderCard(card, i + index))}
+        </View>
+      );
+    }
+    return rows;
+  };
+
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>🔮 Flip cards to find 3 matching pairs:</Text>
-      <FlatList
-        data={cards}
-        keyExtractor={(item) => item.id.toString()}
-        numColumns={3}
-        renderItem={renderCard}
-        columnWrapperStyle={{ justifyContent: "center" }}
-        contentContainerStyle={{
-          gap: 10,
-          paddingBottom: 20,
-          height: 280, // ✅ add fixed height to avoid nesting warning
-        }}
-      />
+      {renderRows()}
       <Text style={styles.feedback}>{feedback}</Text>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 20, alignItems: "center" },
+  container: {
+    gap: 20,
+    alignItems: "center",
+    paddingVertical: 20,
+  },
   title: { fontSize: 18, fontWeight: "bold", textAlign: "center" },
+  row: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 10,
+    marginVertical: 4,
+  },
   card: {
     width: 70,
     height: 70,
     borderRadius: 8,
-    margin: 6,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -146,9 +150,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 12,
     textAlign: "center",
-  },
-  cardImage: {
-    width: 50,
-    height: 50,
   },
 });
