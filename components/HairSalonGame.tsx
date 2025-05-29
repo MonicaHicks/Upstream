@@ -36,9 +36,10 @@ const SCISSOR_HITBOX_OFFSET = 10;
 
 type Props = {
   onWin: () => void;
+  onFail: () => void;
 };
 
-export default function HairSalonGame({ onWin }: Props) {
+export default function HairSalonGame({ onWin, onFail }: Props) {
   const MAX_HEIGHT = GAME_HEIGHT - 200;
 
   const [scissorY, setScissorY] = useState(GAME_HEIGHT / 2);
@@ -58,7 +59,7 @@ export default function HairSalonGame({ onWin }: Props) {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
 
-  const intervalRef = useRef<NodeJS.Timer | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const flap = () => {
     setVelocity(FLAP_VELOCITY);

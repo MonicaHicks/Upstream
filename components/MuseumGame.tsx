@@ -34,9 +34,10 @@ const imagePaths = [
 
 type Props = {
   onWin: () => void;
+  onFail: () => void;
 };
 
-export default function MuseumGame({ onWin }: Props) {
+export default function MuseumGame({ onWin, onFail }: Props) {
   const [gameOver, setGameOver] = useState(false);
   const [rotations, setRotations] = useState<number[]>(
     Array(TILE_COUNT)
@@ -74,6 +75,7 @@ export default function MuseumGame({ onWin }: Props) {
   };
 
   if (gameOver) {
+    onFail();
     return (
       <View style={styles.centeredScreen}>
         <Text style={styles.gameOverText}>

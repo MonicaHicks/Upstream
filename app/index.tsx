@@ -1,6 +1,8 @@
 import RoomIcon from "@/components/RoomIcon";
 import { useGame } from "@/context/GameContext";
 import { Player, Room } from "@/types/types";
+import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
+import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -19,6 +21,10 @@ export default function HomeScreen() {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [showModal, setShowModal] = useState(false);
   const router = useRouter();
+
+  let [fontsLoaded] = useFonts({
+    Cinzel_900Black,
+  });
 
   const handleRoomPress = (room: Room) => {
     if (!room.unlocked) return;
@@ -113,32 +119,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     textAlign: "center",
     color: "white",
-  },
-  roomCard: {
-    flex: 1,
-    margin: 8,
-    height: "50%",
-    width: "20%",
-    borderRadius: 16,
-    overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "flex-end",
-  },
-  roomImage: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 16,
-    opacity: 0.8,
-    resizeMode: "cover",
-    width: "20%",
-  },
-  roomText: {
-    fontWeight: "bold",
-    fontSize: 18,
-    color: "white",
-    backgroundColor: "rgba(0,0,0,0.4)",
-    width: "20%",
-    textAlign: "center",
-    paddingVertical: 8,
+    fontFamily: "Cinzel_900Black",
   },
   modalOverlay: {
     flex: 1,
@@ -157,6 +138,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 16,
+    fontFamily: "Cinzel_900Black",
+    textAlign: "center",
   },
   playerButton: {
     padding: 12,
@@ -169,10 +152,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "black",
     fontSize: 16,
+    fontFamily: "Cinzel_900Black",
   },
   cancel: {
     marginTop: 12,
     color: "#888",
+    fontFamily: "Cinzel_900Black",
   },
   snakeContainer: {
     paddingVertical: 16,

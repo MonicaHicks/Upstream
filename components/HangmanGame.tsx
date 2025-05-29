@@ -34,9 +34,10 @@ const WORDS = [
 
 type Props = {
   onWin: () => void;
+  onFail: () => void;
 };
 
-export default function HangmanGame({ onWin }: Props) {
+export default function HangmanGame({ onWin, onFail }: Props) {
   const [word] = useState(WORDS[Math.floor(Math.random() * WORDS.length)]);
   const [guessed, setGuessed] = useState<string[]>([]);
   const [guess, setGuess] = useState("");
@@ -64,9 +65,15 @@ export default function HangmanGame({ onWin }: Props) {
 
     if (word.includes(upper)) {
       setGuessed([...guessed, upper]);
+      if (word.split("").every((l) => guessed.includes(l))) {
+        onWin();
+      }
     } else {
       setWrongLetters([...wrongLetters, upper]);
       setAttemptsLeft(attemptsLeft - 1);
+      if (attemptsLeft <= 0) {
+        onFail();
+      }
     }
 
     setGuess("");

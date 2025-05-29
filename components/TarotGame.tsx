@@ -36,9 +36,10 @@ function shuffleCards(): {
 
 type Props = {
   onWin: () => void;
+  onFail: () => void;
 };
 
-export default function TarotGame({ onWin }: Props) {
+export default function TarotGame({ onWin, onFail }: Props) {
   const [cards, setCards] = useState(() => shuffleCards());
   const [selected, setSelected] = useState<number[]>([]);
   const [matches, setMatches] = useState(0);
@@ -85,6 +86,9 @@ export default function TarotGame({ onWin }: Props) {
             ? `❌ No match. ${remaining} lives left.`
             : "❌ You're out of readings!"
         );
+        if (remaining <= 0) {
+          onFail();
+        }
       }
     }
   }, [selected]);
