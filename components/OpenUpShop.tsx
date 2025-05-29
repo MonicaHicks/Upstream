@@ -1,5 +1,7 @@
 import { useGame } from "@/context/GameContext";
 import { rooms } from "@/data/rooms";
+import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
+import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
 import { useState } from "react";
 import {
   ScrollView,
@@ -9,6 +11,7 @@ import {
   View,
 } from "react-native";
 import ConfettiCannon from "react-native-confetti-cannon";
+
 type Props = {
   onWin: () => void;
 };
@@ -18,14 +21,24 @@ export default function OpenUpShop({ onWin }: Props) {
   const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  let [fontsLoaded] = useFonts({
+    Cinzel_900Black,
+  });
 
   const visited = currentPlayer?.roomsVisited || [];
-  const secret = currentPlayer?.secretGoal.rooms || [];
+  const secret = currentPlayer?.secretGoal?.rooms || [];
 
   if (!currentPlayer || visited.length === 0) {
     return (
       <View>
-        <Text style={{ textAlign: "center", fontSize: 24, color: "black" }}>
+        <Text
+          style={{
+            fontFamily: "Cinzel_900Black",
+            textAlign: "center",
+            fontSize: 24,
+            color: "black",
+          }}
+        >
           You haven’t visited any rooms yet!
         </Text>
 
@@ -35,9 +48,10 @@ export default function OpenUpShop({ onWin }: Props) {
             marginTop: 18,
             fontSize: 24,
             color: "black",
+            fontFamily: "Cinzel_900Black",
           }}
         >
-          Your clue is: {currentPlayer?.secretGoal.clue}
+          Your clue is: {currentPlayer?.secretGoal?.clue}
         </Text>
       </View>
     );
@@ -63,10 +77,12 @@ export default function OpenUpShop({ onWin }: Props) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={{ fontSize: 30 }}>
-        Your clue is: {currentPlayer.secretGoal.clue}
+      <Text style={{ fontFamily: "Cinzel_900Black", fontSize: 30 }}>
+        Your clue is: {currentPlayer?.secretGoal?.clue}
       </Text>
-      <Text style={styles.title}>Select 3 rooms you think are your goal:</Text>
+      <Text style={styles.title}>
+        Select up to 3 rooms you think are in your goal:
+      </Text>
 
       <View
         style={{
@@ -130,20 +146,36 @@ export default function OpenUpShop({ onWin }: Props) {
 
 const styles = StyleSheet.create({
   container: { padding: 24, gap: 20 },
-  title: { fontSize: 20, fontWeight: "bold", textAlign: "center" },
-  subtitle: { fontSize: 14, textAlign: "center", color: "#666" },
+  title: {
+    fontSize: 20,
+    fontFamily: "Cinzel_900Black",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  subtitle: {
+    fontFamily: "Cinzel_900Black",
+    fontSize: 14,
+    textAlign: "center",
+    color: "#666",
+  },
   button: {
     backgroundColor: "#222",
     padding: 12,
     borderRadius: 8,
     marginTop: 5,
   },
-  buttonText: { color: "white", fontWeight: "bold", textAlign: "center" },
+  buttonText: {
+    color: "white",
+    fontFamily: "Cinzel_900Black",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
   result: {
     marginTop: 16,
     fontSize: 18,
     textAlign: "center",
     fontWeight: "bold",
+    fontFamily: "Cinzel_900Black",
   },
   center: {
     flex: 1,

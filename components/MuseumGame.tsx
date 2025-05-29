@@ -1,3 +1,5 @@
+import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
+import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
 import React, { useEffect, useState } from "react";
 import {
   Dimensions,
@@ -45,6 +47,9 @@ export default function MuseumGame({ onWin, onFail }: Props) {
       .map(() => [0, 90, 180, 270][Math.floor(Math.random() * 4)])
   );
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
+  let [fontsLoaded] = useFonts({
+    Cinzel_900Black,
+  });
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -139,6 +144,7 @@ const styles = StyleSheet.create({
   timerText: {
     fontSize: 28,
     fontWeight: "bold",
+    fontFamily: "Cinzel_900Black",
     color: "#004c3f",
   },
   centeredScreen: {
@@ -151,6 +157,7 @@ const styles = StyleSheet.create({
   gameOverText: {
     fontSize: 24,
     fontWeight: "600",
+    fontFamily: "Cinzel_900Black",
     textAlign: "center",
     color: "#004c3f",
   },

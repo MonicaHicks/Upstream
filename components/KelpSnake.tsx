@@ -1,3 +1,5 @@
+import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
+import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
 import React, { useEffect, useState } from "react";
 import {
   Platform,
@@ -43,6 +45,9 @@ export default function KelpSnake({ onWin, onFail }: Props) {
   const [direction, setDirection] = useState(INITIAL_DIRECTION);
   const [food, setFood] = useState(getRandomFood(INITIAL_SNAKE));
   const [gameOver, setGameOver] = useState(false);
+  let [fontsLoaded] = useFonts({
+    Cinzel_900Black,
+  });
 
   useEffect(() => {
     if (Platform.OS === "web") {
@@ -198,6 +203,7 @@ const styles = StyleSheet.create({
   },
   cellText: {
     fontSize: CELL_SIZE - 4,
+    fontFamily: "Cinzel_900Black",
     textAlign: "center",
   },
   controlsContainer: {
@@ -212,17 +218,20 @@ const styles = StyleSheet.create({
   },
   arrow: {
     fontSize: 40,
+    fontFamily: "Cinzel_900Black",
     padding: 4,
   },
   gameOverText: {
     fontSize: 28,
     fontWeight: "bold",
+    fontFamily: "Cinzel_900Black",
     color: "#444",
     textAlign: "center",
   },
   lengthText: {
     fontSize: 20,
     fontWeight: "bold",
+    fontFamily: "Cinzel_900Black",
     marginTop: 15,
     marginBottom: 8,
     color: "#004c3f",
