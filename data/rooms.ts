@@ -4,6 +4,13 @@ import { Room } from "@/types/types";
 
 export const rooms: Room[] = [
   {
+    id: "open-up-shop",
+    name: "Open Up Shop",
+    color: "#fff",
+    unlocked: true,
+    image: require("@/assets/images/openUpShop.png"),
+  },
+  {
     id: "tarot",
     name: "Tarot",
     color: "#FBE7C6",
@@ -78,7 +85,7 @@ export const rooms: Room[] = [
     name: "Hair Salon",
     color: "#FFC3A0",
     unlocked: true,
-    image: require("@/assets/images/tarot.png"),
+    image: require("@/assets/images/hairSalon.png"),
   },
   {
     id: "stationary-shop",
@@ -86,12 +93,5 @@ export const rooms: Room[] = [
     color: "#AED9E0",
     unlocked: true,
     image: require("@/assets/images/stationary.png"),
-  },
-  {
-    id: "open-up-shop",
-    name: "Open Up Shop",
-    color: "#fff",
-    unlocked: true,
-    image: require("@/assets/images/openUpShop.png"),
   },
 ];

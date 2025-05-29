@@ -26,12 +26,6 @@ export default function HomeScreen() {
     setShowModal(true);
   };
 
-  const chunkArray = (arr: Room[], size: number) => {
-    return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
-      arr.slice(i * size, i * size + size)
-    );
-  };
-
   const handlePlayerSelect = (player: Player) => {
     selectPlayer(player.id);
     setShowModal(false);
@@ -79,27 +73,30 @@ export default function HomeScreen() {
             </View>
           );
         })}
-      </ScrollView>
 
-      <Modal visible={showModal} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Who’s solving this room?</Text>
-            {players.map((player) => (
-              <TouchableOpacity
-                key={player.id}
-                style={[styles.playerButton, { backgroundColor: player.color }]}
-                onPress={() => handlePlayerSelect(player)}
-              >
-                <Text style={styles.playerText}>{player.name}</Text>
+        <Modal visible={showModal} transparent animationType="slide">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Who’s solving this room?</Text>
+              {players.map((player) => (
+                <TouchableOpacity
+                  key={player.id}
+                  style={[
+                    styles.playerButton,
+                    { backgroundColor: player.color },
+                  ]}
+                  onPress={() => handlePlayerSelect(player)}
+                >
+                  <Text style={styles.playerText}>{player.name}</Text>
+                </TouchableOpacity>
+              ))}
+              <TouchableOpacity onPress={() => setShowModal(false)}>
+                <Text style={styles.cancel}>Cancel</Text>
               </TouchableOpacity>
-            ))}
-            <TouchableOpacity onPress={() => setShowModal(false)}>
-              <Text style={styles.cancel}>Cancel</Text>
-            </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
+      </ScrollView>
     </ImageBackground>
   );
 }
@@ -178,9 +175,9 @@ const styles = StyleSheet.create({
     color: "#888",
   },
   snakeContainer: {
-    height: "5%",
     paddingVertical: 16,
     paddingHorizontal: 24,
+    paddingBottom: 80,
   },
   snakeRow: {
     flexDirection: "row",
