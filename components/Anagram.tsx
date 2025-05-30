@@ -158,13 +158,13 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    marginTop: 4,
+    marginTop: 12,
     borderBottomWidth: 3,
     borderColor: "white",
     fontSize: 24,
     color: "white",
     textAlign: "center",
-    width: 150,
+    width: 120,
   },
 
   wordRowOverlay: {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
-  Dimensions,
   Image,
+  ImageBackground,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -10,7 +10,7 @@ import {
 
 const TILE_COUNT = 16;
 const COLUMNS = 4;
-const TILE_SIZE = Dimensions.get("window").width / 6;
+const TILE_SIZE = 72;
 const TIME_LIMIT = 30;
 
 const imagePaths = [
@@ -86,11 +86,15 @@ export default function MuseumGame({ onWin, onFail }: Props) {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.leftColumn}>
-        <Text style={styles.timerText}>Time: {timeLeft}s</Text>
+    <ImageBackground
+      source={require("../assets/images/mbg.png")}
+      style={styles.background}
+    >
+      <View style={styles.timerContainer}>
+        <Text style={styles.timerText}>⏳ {timeLeft}s</Text>
       </View>
-      <View style={styles.rightColumn}>
+
+      <View style={styles.frameArea}>
         <View style={styles.grid}>
           {imagePaths.map((source, index) => (
             <TouchableOpacity
@@ -110,36 +114,44 @@ export default function MuseumGame({ onWin, onFail }: Props) {
           ))}
         </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
-    flexDirection: "row",
-    backgroundColor: "#A9D5C7",
-    padding: 20,
+    resizeMode: "cover",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  leftColumn: {
-    width: 100, // Fixed width so timer doesn’t affect layout
+  timerContainer: {
+    position: "absolute",
+    top: 60,
+    backgroundColor: "white",
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 999,
+    zIndex: 2,
+  },
+  timerText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  frameArea: {
+    marginTop: 220, //i adjust this
+    width: TILE_SIZE * COLUMNS,
+    height: TILE_SIZE * COLUMNS,
     justifyContent: "center",
     alignItems: "center",
   },
-  rightColumn: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
     width: TILE_SIZE * COLUMNS,
-  },
-  timerText: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#004c3f",
+    bottom: 100,
   },
   centeredScreen: {
     flex: 1,
