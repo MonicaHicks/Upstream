@@ -1,101 +1,214 @@
-import React, { useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import color1 from "../assets/images/colors/color1.png";
+import color10 from "../assets/images/colors/color10.png";
+import color11 from "../assets/images/colors/color11.png";
+import color12 from "../assets/images/colors/color12.png";
+import color13 from "../assets/images/colors/color13.png";
+import color14 from "../assets/images/colors/color14.png";
+import color15 from "../assets/images/colors/color15.png";
+import color16 from "../assets/images/colors/color16.png";
+import color2 from "../assets/images/colors/color2.png";
+import color3 from "../assets/images/colors/color3.png";
+import color4 from "../assets/images/colors/color4.png";
+import color5 from "../assets/images/colors/color5.png";
+import color6 from "../assets/images/colors/color6.png";
+import color7 from "../assets/images/colors/color7.png";
+import color8 from "../assets/images/colors/color8.png";
+import color9 from "../assets/images/colors/color9.png";
 
-const COLORS = ["#ff6b6b", "#feca57", "#1dd1a1", "#54a0ff"];
-const COLOR_NAMES = ["Red", "Yellow", "Green", "Blue"];
-const SEQUENCE_LENGTH = 5;
-const DISPLAY_TIME = 700;
+const COLOR_IMAGES = [
+  { name: "color1", source: color1 },
+  { name: "color2", source: color2 },
+  { name: "color3", source: color3 },
+  { name: "color4", source: color4 },
+  { name: "color5", source: color5 },
+  { name: "color6", source: color6 },
+  { name: "color7", source: color7 },
+  { name: "color8", source: color8 },
+  { name: "color9", source: color9 },
+  { name: "color10", source: color10 },
+  { name: "color11", source: color11 },
+  { name: "color12", source: color12 },
+  { name: "color13", source: color13 },
+  { name: "color14", source: color14 },
+  { name: "color15", source: color15 },
+  { name: "color16", source: color16 },
+];
 
-export default function BoutiqueGame({ onWin }) {
-  const [sequence, setSequence] = useState<number[]>([]);
-  const [playerInput, setPlayerInput] = useState<number[]>([]);
-  const [showingIndex, setShowingIndex] = useState<number>(-1);
-  const [inputEnabled, setInputEnabled] = useState(false);
-  const [score, setScore] = useState(0);
+function shuffleArray(array) {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
 
-  const playSequence = (newSeq: number[]) => {
-    let i = 0;
-    const interval = setInterval(() => {
-      setShowingIndex(i);
-      i++;
-      if (i === newSeq.length) {
-        clearInterval(interval);
-        setTimeout(() => {
-          setShowingIndex(-1);
-          setInputEnabled(true);
-        }, DISPLAY_TIME);
-      }
-    }, DISPLAY_TIME);
-  };
+export default function PantoneParade() {
+  const [round, setRound] = useState(1);
+  const [sequence, setSequence] = useState([]);
+  const [shuffled, setShuffled] = useState([]);
+  const [selected, setSelected] = useState([]);
+  const [isCorrect, setIsCorrect] = useState(null);
+  const [revealed, setRevealed] = useState(true);
+  const [viewTime, setViewTime] = useState(5);
+  const [playTime, setPlayTime] = useState(15);
+  const [viewTimer, setViewTimer] = useState(5);
+  const [playTimer, setPlayTimer] = useState(15);
+  const intervalRef = useRef(null);
 
   useEffect(() => {
-    const newSeq = Array.from({ length: SEQUENCE_LENGTH }, () =>
-      Math.floor(Math.random() * COLORS.length)
-    );
-    setSequence(newSeq);
-    setPlayerInput([]);
-    setInputEnabled(false);
-    playSequence(newSeq);
-  }, [score]);
+    startRound(round);
+    return () => clearInterval(intervalRef.current);
+  }, [round]);
 
-  const handlePress = (colorIndex: number) => {
-    if (!inputEnabled) return;
+  const startRound = (roundNum) => {
+    const chosen = shuffleArray(COLOR_IMAGES).slice(0, roundNum + 2);
+    setSequence(chosen);
+    setShuffled(shuffleArray(chosen));
+    setSelected([]);
+    setIsCorrect(null);
+    setRevealed(true);
+    setViewTimer(viewTime);
+    setPlayTimer(playTime);
 
-    const newInput = [...playerInput, colorIndex];
-    setPlayerInput(newInput);
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      setViewTimer((prev) => {
+        if (prev === 1) {
+          clearInterval(intervalRef.current);
+          setRevealed(false);
+          startPlayTimer();
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
 
-    if (sequence[newInput.length - 1] !== colorIndex) {
-      Alert.alert("Oops!", "That's not the right color.", [
-        {
-          text: "Try Again",
-          onPress: () => resetGame(),
-        },
-      ]);
-      return;
-    }
+  const startPlayTimer = () => {
+    intervalRef.current = setInterval(() => {
+      setPlayTimer((prev) => {
+        if (prev === 1) {
+          clearInterval(intervalRef.current);
+          setIsCorrect(false);
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
 
-    if (newInput.length === sequence.length) {
-      if (score + 1 === 3) {
-        onWin();
-      } else {
-        setScore(score + 1);
-      }
+  const handleSelect = (color) => {
+    if (selected.length >= sequence.length || isCorrect !== null) return;
+    const updated = [...selected, color];
+    setSelected(updated);
+    if (updated.length === sequence.length) {
+      const correct = updated.every((c, i) => c.name === sequence[i].name);
+      clearInterval(intervalRef.current);
+      setIsCorrect(correct);
     }
   };
 
-  const resetGame = () => {
-    const newSeq = Array.from({ length: SEQUENCE_LENGTH }, () =>
-      Math.floor(Math.random() * COLORS.length)
-    );
-    setSequence(newSeq);
-    setPlayerInput([]);
-    setScore(0);
-    setInputEnabled(false);
-    playSequence(newSeq);
+  const handleDelete = () => {
+    if (selected.length === 0 || isCorrect !== null) return;
+    const updated = [...selected];
+    updated.pop();
+    setSelected(updated);
   };
+
+  const handleNext = () => {
+    if (round < 3) {
+      setRound(round + 1);
+    } else {
+      setIsCorrect("win");
+    }
+  };
+
+  const handleReset = () => {
+    setRound(1);
+    startRound(1);
+  };
+
+  const renderColorGrid = () => (
+    <View style={styles.grid}>{shuffled.map((c) => renderBlock(c))}</View>
+  );
+
+  const renderBlock = (item) => (
+    <TouchableOpacity
+      key={item.name}
+      style={styles.imageWrapper}
+      onPress={() => handleSelect(item)}
+      disabled={revealed || selected.includes(item)}
+    >
+      <Image
+        source={item.source}
+        style={styles.imageBlock}
+        resizeMode="contain"
+      />
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>🛍️ Boutique Memory</Text>
-      <Text style={styles.subtext}>Round: {score + 1}/3</Text>
+      <Text style={styles.title}>Pantone Parade</Text>
+      <Text style={styles.subtitle}>Round {round} of 3</Text>
+      <Text style={styles.timerText}>
+        {revealed
+          ? `Memorize: ${viewTimer}s`
+          : isCorrect === null
+          ? `Time Left: ${playTimer}s`
+          : null}
+      </Text>
+
       <View style={styles.grid}>
-        {COLORS.map((color, i) => (
-          <TouchableOpacity
-            key={i}
-            onPress={() => handlePress(i)}
-            style={[
-              styles.button,
-              {
-                backgroundColor: color,
-                opacity: showingIndex === i ? 1 : 0.6,
-              },
-            ]}
-            disabled={!inputEnabled}
-          >
-            <Text style={styles.label}>{COLOR_NAMES[i]}</Text>
-          </TouchableOpacity>
+        {(revealed ? sequence : selected).map((c, i) => (
+          <View key={i} style={styles.imageWrapper}>
+            <Image
+              source={c.source}
+              style={styles.smallImageBlock}
+              resizeMode="contain"
+            />
+            <Text style={styles.numberLabel}>{i + 1}.</Text>
+          </View>
         ))}
       </View>
+
+      {!revealed && isCorrect === null && (
+        <>
+          {renderColorGrid()}
+          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+            <Text style={styles.deleteText}>Delete Color</Text>
+          </TouchableOpacity>
+        </>
+      )}
+
+      {isCorrect === true && (
+        <View>
+          <Text style={styles.resultText}>🎉 Correct!</Text>
+          <TouchableOpacity style={styles.resetButton} onPress={handleNext}>
+            <Text style={styles.resetText}>
+              {round < 3 ? "Next Round" : "See Results"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {isCorrect === false && (
+        <View>
+          <Text style={styles.resultText}>
+            ❌ A fashion faux pas! Try again, darling.
+          </Text>
+        </View>
+      )}
+
+      {isCorrect === "win" && (
+        <View>
+          <Text style={styles.resultText}>🌟 You completed all rounds!</Text>
+          <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
+            <Text style={styles.resetText}>Play Again</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }
@@ -103,39 +216,83 @@ export default function BoutiqueGame({ onWin }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5e9f3",
+    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 20,
+    padding: 20,
   },
-  header: {
+  title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 10,
-    color: "#5c0036",
+    marginBottom: 5,
   },
-  subtext: {
+  subtitle: {
     fontSize: 18,
-    marginBottom: 20,
-    color: "#5c0036",
+    marginBottom: 10,
+  },
+  timerText: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginVertical: 5,
+    flexWrap: "wrap",
+    maxWidth: 300,
   },
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-    gap: 16,
-  },
-  button: {
-    width: 100,
-    height: 100,
-    margin: 10,
-    borderRadius: 12,
-    justifyContent: "center",
     alignItems: "center",
+    marginVertical: 10,
+    paddingHorizontal: 0,
+    maxWidth: 320,
   },
-  label: {
-    color: "#fff",
+  imageWrapper: {
+    alignItems: "center",
+    margin: 5,
+  },
+  imageBlock: {
+    width: 90,
+    height: 120,
+  },
+  smallImageBlock: {
+    width: 80,
+    height: 110,
+    margin: 5,
+  },
+  numberLabel: {
+    fontSize: 14,
     fontWeight: "bold",
+    marginTop: 2,
+  },
+  resultText: {
+    fontSize: 20,
+    marginVertical: 20,
+    textAlign: "center",
+  },
+  resetButton: {
+    marginTop: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: "#eee",
+    borderRadius: 6,
+  },
+  resetText: {
     fontSize: 16,
+  },
+  deleteButton: {
+    marginTop: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: "#fdd",
+    borderRadius: 6,
+  },
+  deleteText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#900",
   },
 });
