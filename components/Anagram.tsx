@@ -1,3 +1,5 @@
+import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
+import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -36,6 +38,9 @@ export default function AnagramGame({ onWin, onFail }: Props) {
   const [selectedWords, setSelectedWords] = useState(() =>
     getRandomSubset(fullWordList, 2)
   );
+  let [fontsLoaded] = useFonts({
+    Cinzel_900Black,
+  });
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -199,11 +204,54 @@ const styles = StyleSheet.create({
     backgroundColor: "#994DDB",
     color: "white",
     fontSize: 16,
+    fontFamily: "Cinzel_900Black",
     padding: 16,
     borderRadius: 12,
     marginTop: 20,
     marginBottom: 20,
     textAlign: "center",
+  },
+  bubbleCutoff: {
+    backgroundColor: "#994DDB",
+    marginTop: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    alignSelf: "center",
+    textAlign: "center",
+    color: "white",
+    fontSize: 18,
+    fontFamily: "Cinzel_900Black",
+    fontWeight: "600",
+  },
+  menu: {
+    fontSize: 24,
+    fontFamily: "Cinzel_900Black",
+    fontWeight: "bold",
+    marginBottom: 10,
+    marginTop: 50,
+  },
+  timer: {
+    fontSize: 20,
+    fontFamily: "Cinzel_900Black",
+    marginBottom: 20,
+  },
+  wordRow: {
+    marginBottom: 20,
+    alignItems: "center",
+  },
+  scrambled: {
+    fontSize: 20,
+    fontFamily: "Cinzel_900Black",
+    marginBottom: 6,
+  },
+  input: {
+    borderBottomWidth: 2,
+    borderColor: "black",
+    fontFamily: "Cinzel_900Black",
+    fontSize: 20,
+    textAlign: "center",
+    minWidth: 100,
   },
   button: {
     marginBottom: 30,
@@ -219,6 +267,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 18,
     fontWeight: "600",
+    fontFamily: "Cinzel_900Black",
     color: "#4B0082",
   },
   introRow: {

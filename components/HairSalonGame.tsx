@@ -3,6 +3,8 @@
 //You are cutting hair. The "pipes" are hair, and the different colored hair pieces
 //are "dead hair" that you are cutting. Cut 10 to win (will likely reduce this down to 6-8)
 
+import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
+import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
@@ -13,12 +15,19 @@ import {
   View,
 } from "react-native";
 
+// @ts-ignore
 import chopped from "../assets/images/hairassets/chopped.png";
+// @ts-ignore
 import deadHair from "../assets/images/hairassets/dead.png";
+// @ts-ignore
 import healthyEnd from "../assets/images/hairassets/healthyend.png";
+// @ts-ignore
 import healthyTop from "../assets/images/hairassets/healthytop.png";
+// @ts-ignore
 import background from "../assets/images/hairassets/hsmobile.png";
+// @ts-ignore
 import scissorsImg from "../assets/images/hairassets/hss.png";
+// @ts-ignore
 import topcut from "../assets/images/hairassets/topcut.png";
 
 import hairLoss from "../assets/images/hairassets/hairloss.png";
@@ -69,6 +78,9 @@ export default function HairSalonGame({ onWin, onFail }: Props) {
   );
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
+  let [fontsLoaded] = useFonts({
+    Cinzel_900Black,
+  });
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -303,12 +315,14 @@ const styles = StyleSheet.create({
   score: {
     fontSize: 22,
     fontWeight: "bold",
+    fontFamily: "Cinzel_900Black",
     color: "#004c3f",
     marginBottom: 12,
   },
   overlayScreen: {
     width: "90%",
     height: GAME_HEIGHT,
+    fontFamily: "Cinzel_900Black",
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "flex-end",
@@ -336,6 +350,7 @@ const styles = StyleSheet.create({
   startButtonText: {
     color: "#fff",
     fontWeight: "bold",
+    fontFamily: "Cinzel_900Black",
     fontSize: 16,
   },
 });

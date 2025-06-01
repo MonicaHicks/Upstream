@@ -15,4 +15,6 @@ export type Room = {
   color: string;
   unlocked: boolean;
   image: any;
+  happyfish: any;
+  sadfish: any;
 };

@@ -19,6 +19,7 @@ import { checkAnswer } from "@/utils/checkAnswer";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  Image,
   ImageBackground,
   Modal,
   ScrollView,
@@ -55,6 +56,8 @@ export default function RoomScreen() {
   const [solved, setSolved] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [chosenMode, setChosenMode] = useState<"riddle" | "game" | null>(null);
+  const [showResult, setShowResult] = useState(false);
+  const [won, setWon] = useState<boolean | null>(null);
 
   if (!room || !currentPlayer) {
     return (
@@ -81,6 +84,14 @@ export default function RoomScreen() {
     markChallengeSolved(room.id);
     setSolved(true);
     setFeedback(msg);
+    setWon(true);
+    setShowResult(true);
+  };
+
+  const handleGameFail = (msg: string) => {
+    incrementAttemptsForRoom(currentPlayer.id, room.id);
+    setWon(false);
+    setShowResult(true);
   };
 
   const hasMiniGame = [
@@ -184,90 +195,110 @@ export default function RoomScreen() {
             <>
               {room.id === "gambling-den" && (
                 <GamblingGame
-                  onWin={() => handleGameWin("🎲 Gambling Ace!")}
-                  onFail={() =>
-                    incrementAttemptsForRoom(currentPlayer.id, room.id)
-                  }
+                  onWin={() => handleGameWin("Gambling Ace!")}
+                  onFail={() => handleGameFail("Nice try!")}
                 />
               )}
               {room.id === "bakery" && (
                 <BakeryGame
-                  onWin={() => handleGameWin("🥖 Pro Baker!")}
-                  onFail={() =>
-                    incrementAttemptsForRoom(currentPlayer.id, room.id)
-                  }
+                  onWin={() => handleGameWin("Pro Baker!")}
+                  onFail={() => handleGameFail("Nice try!")}
                 />
               )}
               {room.id === "tarot" && (
                 <TarotGame
-                  onWin={() => handleGameWin("🔮 Tarot Master!")}
-                  onFail={() =>
-                    incrementAttemptsForRoom(currentPlayer.id, room.id)
-                  }
+                  onWin={() => handleGameWin("Tarot Master!")}
+                  onFail={() => handleGameFail("Nice try!")}
                 />
               )}
               {room.id === "open-up-shop" && (
                 <OpenUpShop
-                  onWin={() => handleGameWin("🏪 You're ready to open!")}
+                  onWin={() => handleGameWin("You're ready to open!")}
                 />
               )}
               {room.id === "stationary-shop" && (
                 <HangmanGame
-                  onWin={() => handleGameWin("🖊️ Stationery Star!")}
-                  onFail={() =>
-                    incrementAttemptsForRoom(currentPlayer.id, room.id)
-                  }
+                  onWin={() => handleGameWin("Stationery Star!")}
+                  onFail={() => handleGameFail("Nice try!")}
                 />
               )}
               {room.id === "fish-pub" && (
                 <Anagram
                   onWin={() =>
-                    handleGameWin("🍻 You’re not too drunk to read!")
+                    handleGameWin("You’re not too drunk to read!")
                   }
-                  onFail={() =>
-                    incrementAttemptsForRoom(currentPlayer.id, room.id)
-                  }
+                  onFail={() => handleGameFail("Nice try!")}
                 />
               )}
               {room.id === "museum" && (
                 <MuseumGame
-                  onWin={() => handleGameWin("🦴 Fossil Finder!")}
-                  onFail={() =>
-                    incrementAttemptsForRoom(currentPlayer.id, room.id)
-                  }
+                  onWin={() => handleGameWin("Fossil Finder!")}
+                  onFail={() => handleGameFail("Nice try!")}
                 />
               )}
               {room.id === "hat-store" && (
                 <HatGame
                   onWin={() => handleGameWin("Hat Master!")}
-                  onFail={() =>
-                    incrementAttemptsForRoom(currentPlayer.id, room.id)
-                  }
+                  onFail={() => handleGameFail("Nice try!")}
                 />
               )}
               {room.id === "kelp-nursery" && (
                 <KelpSnake
-                  onWin={() => handleGameWin("🌿 Green Thumb!")}
-                  onFail={() =>
-                    incrementAttemptsForRoom(currentPlayer.id, room.id)
-                  }
+                  onWin={() => handleGameWin("Green Thumb!")}
+                  onFail={() => handleGameFail("Nice try!")}
                 />
               )}
               {room.id === "hair-salon" && (
                 <HairSalonGame
-                  onWin={() => handleGameWin("💇 Honey, you've got style!")}
-                  onFail={() =>
-                    incrementAttemptsForRoom(currentPlayer.id, room.id)
-                  }
+                  onWin={() => handleGameWin("Honey, you've got style!")}
+                  onFail={() => handleGameFail("Nice try!")}
                 />
               )}
               {room.id === "fish-fashion" && (
-                <BoutiqueGame onWin={() => handleGameWin("🧵 Fashion Icon!")} />
+                <BoutiqueGame
+                  onWin={() => handleGameWin("Fashion Icon!")}
+                  onFail={() => handleGameFail("Nice try!")}
+                />
               )}
             </>
           )}
 
-          {feedback !== "" && <Text style={styles.feedback}>{feedback}</Text>}
+          {showResult && (
+            <Modal transparent animationType="fade" visible>
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                  <Image
+                    source={won ? room.happyfish : room.sadfish}
+                    style={{
+                      width: 100,
+                      height: 100,
+                      marginBottom: 16,
+                      resizeMode: "contain",
+                    }}
+                  />
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      textAlign: "center",
+                      marginBottom: 16,
+                      fontFamily: "Cinzel_900Black",
+                    }}
+                  >
+                    {won ? "You did it!" : "Try again next time!"}
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                      setShowResult(false);
+                      router.back();
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Back to Map</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          )}
 
           <TouchableOpacity
             onPress={() => router.back()}

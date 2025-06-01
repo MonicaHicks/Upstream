@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import GamePopupModal from "./GamePopUpModal";
 
 interface Props {
   onWin: () => void;
@@ -110,6 +111,9 @@ export default function BakeryWordSearch({ onWin, onFail }: Props) {
   const [targetWords, setTargetWords] = useState<string[]>([]);
   const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS);
   const [wordPositions, setWordPositions] = useState<Coord[][]>([]);
+  const [showIntro, setShowIntro] = useState(true);
+  const [showRules, setShowRules] = useState(false);
+
   let [fontsLoaded] = useFonts({
     Cinzel_900Black,
   });
@@ -128,7 +132,6 @@ export default function BakeryWordSearch({ onWin, onFail }: Props) {
 
   useEffect(() => {
     if (timeLeft <= 0) {
-      Alert.alert("⏰ Time's Up!", "You ran out of time!");
       onFail();
     } else {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
@@ -154,7 +157,9 @@ export default function BakeryWordSearch({ onWin, onFail }: Props) {
       const newFound = [...found, targetWords[matchIndex]];
       setFound(newFound);
       setFoundCoords([...foundCoords, wordPositions[matchIndex]]);
-      if (newFound.length === TARGET_WORD_COUNT) onWin();
+      if (newFound.length === TARGET_WORD_COUNT) {
+        onWin();
+      }
     } else {
       Alert.alert("No Match", "That combination is not a target word.");
     }
@@ -169,45 +174,69 @@ export default function BakeryWordSearch({ onWin, onFail }: Props) {
     );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.timer}>Time Left: {timeLeft}s</Text>
-      <Text style={styles.instructions}>
-        {TARGET_WORD_COUNT - found.length} words left
-      </Text>
-      <View style={styles.gridContainer}>
-        {grid.map((row, r) => (
-          <View key={r} style={styles.row}>
-            {row.map((letter, c) => (
-              <Pressable
-                key={`${r}-${c}`}
-                onPress={() => toggleSelect(r, c)}
-                style={[
-                  styles.cell,
-                  isSelected(r, c) && styles.selectedCell,
-                  isFound(r, c) && styles.foundCell,
-                ]}
-              >
-                <Text style={styles.cellText}>{letter}</Text>
-              </Pressable>
+    <>
+      <GamePopupModal
+        visible={showIntro}
+        imageSrc={require("../assets/images/shopowners/happybakery.png")}
+        message={"I am the bakery fish"}
+        onClose={() => {
+          setShowIntro(false);
+          setShowRules(true);
+        }}
+      />
+
+      <GamePopupModal
+        visible={showRules}
+        imageSrc={require("../assets/images/shopowners/happybakery.png")}
+        message={"Find the words"}
+        onClose={() => setShowRules(false)}
+      />
+
+      {!showIntro && !showRules && (
+        <View style={styles.container}>
+          <Text style={styles.timer}>Time Left: {timeLeft}s</Text>
+          <Text style={styles.instructions}>
+            {TARGET_WORD_COUNT - found.length} words left
+          </Text>
+          <View style={styles.gridContainer}>
+            {grid.map((row, r) => (
+              <View key={r} style={styles.row}>
+                {row.map((letter, c) => (
+                  <Pressable
+                    key={`${r}-${c}`}
+                    onPress={() => toggleSelect(r, c)}
+                    style={[
+                      styles.cell,
+                      isSelected(r, c) && styles.selectedCell,
+                      isFound(r, c) && styles.foundCell,
+                    ]}
+                  >
+                    <Text style={styles.cellText}>{letter}</Text>
+                  </Pressable>
+                ))}
+              </View>
             ))}
           </View>
-        ))}
-      </View>
-      <Text style={styles.foundText}>Found: {found.join(", ")}</Text>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={checkSelection} style={styles.submitButton}>
-          <Text style={styles.submitText}>Submit Word</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() =>
-            Alert.alert("Hint", "Words: " + targetWords.join(", "))
-          }
-          style={styles.hintButton}
-        >
-          <Text style={styles.hintText}>Hint</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          <Text style={styles.foundText}>Found: {found.join(", ")}</Text>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              onPress={checkSelection}
+              style={styles.submitButton}
+            >
+              <Text style={styles.submitText}>Submit Word</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                Alert.alert("Hint", "Words: " + targetWords.join(", "))
+              }
+              style={styles.hintButton}
+            >
+              <Text style={styles.hintText}>Hint</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+    </>
   );
 }
 

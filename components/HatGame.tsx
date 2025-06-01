@@ -1,3 +1,5 @@
+import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
+import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
 import React, { useState } from "react";
 import {
   Alert,
@@ -8,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import GamePopupModal from "./GamePopUpModal";
 
 const GRID_SIZE = 6;
 const TILE_SIZE = 50;
@@ -65,6 +68,12 @@ export default function HatGame({ onWin, onFail }: Props) {
   );
   const [score, setScore] = useState<number>(0);
   const [resolving, setResolving] = useState<boolean>(false);
+  const [showIntro, setShowIntro] = useState(true);
+  const [showRules, setShowRules] = useState(false);
+
+  let [fontsLoaded] = useFonts({
+    Cinzel_900Black,
+  });
 
   const handlePress = (row: number, col: number) => {
     if (resolving) return;
@@ -179,7 +188,7 @@ export default function HatGame({ onWin, onFail }: Props) {
     const newScore = score + cleared;
     setScore(newScore);
 
-    if (newScore >= 50) {
+    if (newScore >= 25) {
       onWin();
       return;
     }
@@ -211,40 +220,65 @@ export default function HatGame({ onWin, onFail }: Props) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.score}>🎩 Score: {score}</Text>
-      <View style={styles.grid}>
-        {grid.map((row, r) =>
-          row.map((hatIndex, c) => (
-            <TouchableOpacity
-              key={`${r}-${c}`}
-              style={[
-                styles.tile,
-                selected?.row === r && selected?.col === c && styles.selected,
-              ]}
-              onPress={() => handlePress(r, c)}
-            >
-              {hatIndex !== null && (
-                <Image
-                  source={HAT_IMAGES[hatIndex]}
-                  style={styles.image}
-                  resizeMode="contain"
-                />
-              )}
-            </TouchableOpacity>
-          ))
-        )}
-      </View>
-      <TouchableOpacity onPress={giveUp} style={styles.button}>
-        <Text style={styles.buttonText}>Give Up</Text>
-      </TouchableOpacity>
-    </View>
+    <>
+      <GamePopupModal
+        visible={showIntro}
+        imageSrc={require("../assets/images/shopowners/happyhat.png")}
+        message={"I am the hat shop fish"}
+        onClose={() => {
+          setShowIntro(false);
+          setShowRules(true);
+        }}
+      />
+
+      <GamePopupModal
+        visible={showRules}
+        imageSrc={require("../assets/images/shopowners/happyhat.png")}
+        message={
+          "Match three hats in a row to make them disappear!\n\nGet 25 points to win."
+        }
+        onClose={() => setShowRules(false)}
+      />
+
+      {!showIntro && !showRules && (
+        <View style={styles.container}>
+          <Text style={styles.score}>🎩 Score: {score}</Text>
+          <View style={styles.grid}>
+            {grid.map((row, r) =>
+              row.map((hatIndex, c) => (
+                <TouchableOpacity
+                  key={`${r}-${c}`}
+                  style={[
+                    styles.tile,
+                    selected?.row === r &&
+                      selected?.col === c &&
+                      styles.selected,
+                  ]}
+                  onPress={() => handlePress(r, c)}
+                >
+                  {hatIndex !== null && (
+                    <Image
+                      source={HAT_IMAGES[hatIndex]}
+                      style={styles.image}
+                      resizeMode="contain"
+                    />
+                  )}
+                </TouchableOpacity>
+              ))
+            )}
+          </View>
+          <TouchableOpacity onPress={giveUp} style={styles.button}>
+            <Text style={styles.buttonText}>Give Up</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: { alignItems: "center", paddingTop: 40 },
-  score: { fontSize: 20, marginBottom: 10 },
+  score: { fontSize: 20, fontFamily: "Cinzel_900Black", marginBottom: 10 },
   grid: {
     width: GRID_SIZE * TILE_SIZE,
     flexDirection: "row",
@@ -275,5 +309,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontWeight: "bold",
+    fontFamily: "Cinzel_900Black",
   },
 });
