@@ -195,44 +195,44 @@ export default function RoomScreen() {
             <>
               {room.id === "gambling-den" && (
                 <GamblingGame
-                  onWin={() => handleGameWin("🎲 Gambling Ace!")}
+                  onWin={() => handleGameWin("Gambling Ace!")}
                   onFail={() => handleGameFail("Nice try!")}
                 />
               )}
               {room.id === "bakery" && (
                 <BakeryGame
-                  onWin={() => handleGameWin("🥖 Pro Baker!")}
+                  onWin={() => handleGameWin("Pro Baker!")}
                   onFail={() => handleGameFail("Nice try!")}
                 />
               )}
               {room.id === "tarot" && (
                 <TarotGame
-                  onWin={() => handleGameWin("🔮 Tarot Master!")}
+                  onWin={() => handleGameWin("Tarot Master!")}
                   onFail={() => handleGameFail("Nice try!")}
                 />
               )}
               {room.id === "open-up-shop" && (
                 <OpenUpShop
-                  onWin={() => handleGameWin("🏪 You're ready to open!")}
+                  onWin={() => handleGameWin("You're ready to open!")}
                 />
               )}
               {room.id === "stationary-shop" && (
                 <HangmanGame
-                  onWin={() => handleGameWin("🖊️ Stationery Star!")}
+                  onWin={() => handleGameWin("Stationery Star!")}
                   onFail={() => handleGameFail("Nice try!")}
                 />
               )}
               {room.id === "fish-pub" && (
                 <Anagram
                   onWin={() =>
-                    handleGameWin("🍻 You’re not too drunk to read!")
+                    handleGameWin("You’re not too drunk to read!")
                   }
                   onFail={() => handleGameFail("Nice try!")}
                 />
               )}
               {room.id === "museum" && (
                 <MuseumGame
-                  onWin={() => handleGameWin("🦴 Fossil Finder!")}
+                  onWin={() => handleGameWin("Fossil Finder!")}
                   onFail={() => handleGameFail("Nice try!")}
                 />
               )}
@@ -244,19 +244,19 @@ export default function RoomScreen() {
               )}
               {room.id === "kelp-nursery" && (
                 <KelpSnake
-                  onWin={() => handleGameWin("🌿 Green Thumb!")}
+                  onWin={() => handleGameWin("Green Thumb!")}
                   onFail={() => handleGameFail("Nice try!")}
                 />
               )}
               {room.id === "hair-salon" && (
                 <HairSalonGame
-                  onWin={() => handleGameWin("💇 Honey, you've got style!")}
+                  onWin={() => handleGameWin("Honey, you've got style!")}
                   onFail={() => handleGameFail("Nice try!")}
                 />
               )}
               {room.id === "fish-fashion" && (
                 <BoutiqueGame
-                  onWin={() => handleGameWin("🧵 Fashion Icon!")}
+                  onWin={() => handleGameWin("Fashion Icon!")}
                   onFail={() => handleGameFail("Nice try!")}
                 />
               )}
@@ -284,7 +284,7 @@ export default function RoomScreen() {
                       fontFamily: "Cinzel_900Black",
                     }}
                   >
-                    {won ? "You did it! 🎉" : "Try again next time! 😢"}
+                    {won ? "You did it!" : "Try again next time!"}
                   </Text>
                   <TouchableOpacity
                     style={styles.button}
