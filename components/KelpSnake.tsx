@@ -2,14 +2,17 @@ import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
 import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
 import React, { useEffect, useState } from "react";
 import {
+  Image,
   Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import arrow from "../assets/images/kelpass/arrow.png";
+import sun from "../assets/images/kelpass/sun.png";
 
-const CELL_SIZE = 24;
+const CELL_SIZE = 20;
 const GRID_SIZE = 15;
 const GAME_TICK_MS = 200;
 const INITIAL_SNAKE = [
@@ -18,18 +21,14 @@ const INITIAL_SNAKE = [
 ];
 const INITIAL_DIRECTION = { x: 1, y: 0 };
 
-function getRandomFood(snake: any) {
-  let newFood: any;
+function getRandomFood(snake) {
+  let newFood;
   while (true) {
     newFood = {
       x: Math.floor(Math.random() * GRID_SIZE),
       y: Math.floor(Math.random() * GRID_SIZE),
     };
-    if (
-      !snake.some(
-        (segment: any) => segment.x === newFood.x && segment.y === newFood.y
-      )
-    ) {
+    if (!snake.some((s) => s.x === newFood.x && s.y === newFood.y)) {
       return newFood;
     }
   }
@@ -37,10 +36,9 @@ function getRandomFood(snake: any) {
 
 type Props = {
   onWin: () => void;
-  onFail: () => void;
 };
 
-export default function KelpSnake({ onWin, onFail }: Props) {
+export default function KelpSnake({ onWin }: Props) {
   const [snake, setSnake] = useState(INITIAL_SNAKE);
   const [direction, setDirection] = useState(INITIAL_DIRECTION);
   const [food, setFood] = useState(getRandomFood(INITIAL_SNAKE));
@@ -76,10 +74,10 @@ export default function KelpSnake({ onWin, onFail }: Props) {
     if (gameOver) return;
 
     const interval = setInterval(() => {
-      setSnake((prevSnake) => {
+      setSnake((prev) => {
         const newHead = {
-          x: prevSnake[0].x + direction.x,
-          y: prevSnake[0].y + direction.y,
+          x: prev[0].x + direction.x,
+          y: prev[0].y + direction.y,
         };
 
         if (
@@ -87,23 +85,17 @@ export default function KelpSnake({ onWin, onFail }: Props) {
           newHead.y < 0 ||
           newHead.x >= GRID_SIZE ||
           newHead.y >= GRID_SIZE ||
-          prevSnake.some((seg) => seg.x === newHead.x && seg.y === newHead.y)
+          prev.some((s) => s.x === newHead.x && s.y === newHead.y)
         ) {
           setGameOver(true);
-          onFail();
-          return prevSnake;
+          return prev;
         }
 
-        const newSnake = [newHead, ...prevSnake];
+        const newSnake = [newHead, ...prev];
         const isEating = newHead.x === food.x && newHead.y === food.y;
 
         if (isEating) {
-          const nextFood = getRandomFood(newSnake);
-          setFood(nextFood);
-          if (newSnake.length >= 10) {
-            onWin();
-            clearInterval(interval);
-          }
+          setFood(getRandomFood(newSnake));
           return newSnake;
         } else {
           newSnake.pop();
@@ -115,6 +107,12 @@ export default function KelpSnake({ onWin, onFail }: Props) {
     return () => clearInterval(interval);
   }, [direction, food, gameOver]);
 
+  useEffect(() => {
+    if (!gameOver && snake.length >= 10) {
+      onWin();
+    }
+  }, [snake, gameOver]);
+
   const handleArrow = (dx: number, dy: number) => {
     setDirection({ x: dx, y: dy });
   };
@@ -125,17 +123,40 @@ export default function KelpSnake({ onWin, onFail }: Props) {
       (seg, idx) => idx > 0 && seg.x === x && seg.y === y
     );
     const isFood = food.x === x && food.y === y;
-    let cellContent = "";
-    if (isHead) cellContent = "🪴";
-    else if (isBody) cellContent = "🌱"; // kelp :D
-    else if (isFood) cellContent = "☀️";
+    let content = null;
+
+    if (isFood) {
+      content = (
+        <Image
+          source={sun}
+          style={{ width: CELL_SIZE - 4, height: CELL_SIZE - 4 }}
+        />
+      );
+    } else if (isHead) {
+      content = <Text style={styles.cellText}>🪴</Text>;
+    } else if (isBody) {
+      content = <Text style={styles.cellText}>🌱</Text>;
+    }
 
     return (
       <View key={`${x}-${y}`} style={styles.cell}>
-        <Text style={styles.cellText}>{cellContent}</Text>
+        {content}
       </View>
     );
   };
+
+  const renderArrow = (rotation: string, onPress: () => void) => (
+    <TouchableOpacity onPress={onPress}>
+      <Image
+        source={arrow}
+        style={{
+          width: 40,
+          height: 40,
+          transform: [{ rotate: rotation }],
+        }}
+      />
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.screen}>
@@ -152,21 +173,13 @@ export default function KelpSnake({ onWin, onFail }: Props) {
             </View>
           </View>
           <View style={styles.controlsContainer}>
-            <TouchableOpacity onPress={() => handleArrow(0, -1)}>
-              <Text style={styles.arrow}>⬆️</Text>
-            </TouchableOpacity>
+            {renderArrow("-90deg", () => handleArrow(0, -1))}
             <View style={styles.arrowRow}>
-              <TouchableOpacity onPress={() => handleArrow(-1, 0)}>
-                <Text style={styles.arrow}>⬅️</Text>
-              </TouchableOpacity>
+              {renderArrow("180deg", () => handleArrow(-1, 0))}
               <View style={{ width: 24 }} />
-              <TouchableOpacity onPress={() => handleArrow(1, 0)}>
-                <Text style={styles.arrow}>➡️</Text>
-              </TouchableOpacity>
+              {renderArrow("0deg", () => handleArrow(1, 0))}
             </View>
-            <TouchableOpacity onPress={() => handleArrow(0, 1)}>
-              <Text style={styles.arrow}>⬇️</Text>
-            </TouchableOpacity>
+            {renderArrow("90deg", () => handleArrow(0, 1))}
           </View>
         </>
       )}
@@ -182,10 +195,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   gridWrapper: {
-    padding: 10,
+    padding: 12,
     backgroundColor: "white",
-    borderRadius: 8,
+    borderRadius: 16,
     marginBottom: 20,
+    width: GRID_SIZE * CELL_SIZE + 34,
+    height: GRID_SIZE * CELL_SIZE + 34,
+    alignItems: "center",
+    justifyContent: "center",
   },
   grid: {
     width: GRID_SIZE * CELL_SIZE,

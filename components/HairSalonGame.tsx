@@ -30,7 +30,14 @@ import scissorsImg from "../assets/images/hairassets/hss.png";
 // @ts-ignore
 import topcut from "../assets/images/hairassets/topcut.png";
 
+import hairLoss from "../assets/images/hairassets/hairloss.png";
+import hairWin from "../assets/images/hairassets/hairwin.png";
+import intro1 from "../assets/images/hairassets/intro.png";
+import intro2 from "../assets/images/hairassets/intro2.png";
+
 const SCREEN_WIDTH = Dimensions.get("window").width;
+const SCREEN_HEIGHT = Dimensions.get("window").height;
+
 const GRAVITY = 2;
 const FLAP_VELOCITY = -20;
 const OBSTACLE_WIDTH = 60;
@@ -50,6 +57,10 @@ type Props = {
 
 export default function HairSalonGame({ onWin, onFail }: Props) {
   const MAX_HEIGHT = GAME_HEIGHT - 200;
+
+  const [screenIndex, setScreenIndex] = useState<
+    "intro1" | "intro2" | "game" | "win" | "loss"
+  >("intro1");
 
   const [scissorY, setScissorY] = useState(GAME_HEIGHT / 2);
   const [velocity, setVelocity] = useState(0);
@@ -97,6 +108,8 @@ export default function HairSalonGame({ onWin, onFail }: Props) {
   };
 
   useEffect(() => {
+    if (screenIndex !== "game") return;
+
     intervalRef.current = setInterval(() => {
       setVelocity((v) => v + GRAVITY);
       setScissorY((y) => Math.min(GAME_HEIGHT - 100, y + velocity));
@@ -133,9 +146,11 @@ export default function HairSalonGame({ onWin, onFail }: Props) {
     }, INTERVAL);
 
     return () => clearInterval(intervalRef.current!);
-  }, [velocity]);
+  }, [velocity, screenIndex]);
 
   useEffect(() => {
+    if (screenIndex !== "game") return;
+
     for (const obs of obstacles) {
       const inXRange = obs.x < 90 && obs.x + OBSTACLE_WIDTH > 60;
       const inYRange =
@@ -145,13 +160,41 @@ export default function HairSalonGame({ onWin, onFail }: Props) {
       if (inXRange && inYRange) {
         setGameOver(true);
         clearInterval(intervalRef.current!);
+        setScreenIndex("loss");
       }
     }
+
     if (score >= 10) {
       clearInterval(intervalRef.current!);
-      onWin();
+      setScreenIndex("win");
     }
-  }, [obstacles, scissorY]);
+  }, [obstacles, scissorY, screenIndex]);
+
+  const renderOverlayScreen = (
+    img: any,
+    nextAction?: () => void,
+    buttonLabel?: string
+  ) => (
+    <View style={styles.overlayScreen}>
+      <Image source={img} style={styles.overlayImage} />
+      {nextAction && buttonLabel ? (
+        <TouchableOpacity style={styles.startButton} onPress={nextAction}>
+          <Text style={styles.startButtonText}>{buttonLabel}</Text>
+        </TouchableOpacity>
+      ) : null}
+    </View>
+  );
+
+  if (screenIndex === "intro1")
+    return renderOverlayScreen(intro1, () => setScreenIndex("intro2"), "NEXT");
+  if (screenIndex === "intro2")
+    return renderOverlayScreen(
+      intro2,
+      () => setScreenIndex("game"),
+      "I'M READY!"
+    );
+  if (screenIndex === "win") return renderOverlayScreen(hairWin);
+  if (screenIndex === "loss") return renderOverlayScreen(hairLoss);
 
   return (
     <View style={styles.container}>
@@ -238,15 +281,6 @@ export default function HairSalonGame({ onWin, onFail }: Props) {
           </View>
         </TouchableOpacity>
       </View>
-
-      {gameOver && (
-        <>
-          <Text style={styles.gameOver}>💇‍♀️ You snipped too hard!</Text>
-          <TouchableOpacity style={styles.reset} onPress={resetGame}>
-            <Text style={styles.resetText}>Try Again</Text>
-          </TouchableOpacity>
-        </>
-      )}
     </View>
   );
 }
@@ -285,23 +319,38 @@ const styles = StyleSheet.create({
     color: "#004c3f",
     marginBottom: 12,
   },
-  gameOver: {
-    fontSize: 24,
-    fontWeight: "bold",
+  overlayScreen: {
+    width: "90%",
+    height: GAME_HEIGHT,
     fontFamily: "Cinzel_900Black",
-    color: "#a33",
-    textAlign: "center",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    backgroundColor: "black",
+    overflow: "hidden",
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#ccc",
     marginTop: 20,
   },
-  reset: {
-    marginTop: 10,
-    padding: 12,
-    backgroundColor: "#444",
-    borderRadius: 8,
+  overlayImage: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
-  resetText: {
-    color: "white",
+  startButton: {
+    backgroundColor: "#FFA726",
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 28,
+    marginBottom: 16,
+    zIndex: 2,
+  },
+  startButtonText: {
+    color: "#fff",
     fontWeight: "bold",
     fontFamily: "Cinzel_900Black",
+    fontSize: 16,
   },
 });

@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
+  ImageBackground,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+
 const fishImages = [
   require("../assets/images/group1.png"),
   require("../assets/images/group2.png"),
@@ -18,19 +19,7 @@ const fishImages = [
   require("../assets/images/group8.png"),
 ];
 
-const WORDS = [
-  "PENCIL",
-  "PAPER",
-  "NOTEBOOK",
-  "SHARPENER",
-  "RULER",
-  "MARKER",
-  "CRAYON",
-  "HIGHLIGHTER",
-  "STICKERS",
-  "WASHI",
-  "JOURNAL",
-];
+const WORDS = ["PENCIL", "PAPER", "RULER", "MARKER", "CRAYON", "WASHI"];
 
 type Props = {
   onWin: () => void;
@@ -40,43 +29,43 @@ type Props = {
 export default function HangmanGame({ onWin, onFail }: Props) {
   const [word] = useState(WORDS[Math.floor(Math.random() * WORDS.length)]);
   const [guessed, setGuessed] = useState<string[]>([]);
-  const [guess, setGuess] = useState("");
   const [attemptsLeft, setAttemptsLeft] = useState(7);
   const [wrongLetters, setWrongLetters] = useState<string[]>([]);
   const [error, setError] = useState("");
+  const [timeLeft, setTimeLeft] = useState(60);
+
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      onFail();
+      return;
+    }
+    const timer = setTimeout(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [timeLeft]);
 
   const maskedWord = word
     .split("")
     .map((letter) => (guessed.includes(letter) ? letter : "_"))
     .join(" ");
 
-  const handleGuess = () => {
-    const upper = guess.toUpperCase();
-
-    if (!upper.match(/^[A-Z]$/)) {
-      setError("Please enter a valid letter (A–Z).");
-      return;
-    }
-
-    if (guessed.includes(upper) || wrongLetters.includes(upper)) {
-      setError(`You already guessed "${upper}".`);
-      return;
-    }
+  const handleGuess = (input: string) => {
+    const upper = input.toUpperCase();
+    if (guessed.includes(upper) || wrongLetters.includes(upper)) return;
 
     if (word.includes(upper)) {
-      setGuessed([...guessed, upper]);
-      if (word.split("").every((l) => guessed.includes(l))) {
-        onWin();
-      }
+      const newGuessed = [...guessed, upper];
+      setGuessed(newGuessed);
+      if (word.split("").every((l) => newGuessed.includes(l))) onWin();
     } else {
-      setWrongLetters([...wrongLetters, upper]);
-      setAttemptsLeft(attemptsLeft - 1);
-      if (attemptsLeft <= 0) {
-        onFail();
-      }
+      const newWrong = [...wrongLetters, upper];
+      const remaining = attemptsLeft - 1;
+      setWrongLetters(newWrong);
+      setAttemptsLeft(remaining);
+      if (remaining <= 0) onFail();
     }
 
-    setGuess("");
     setError("");
   };
 
@@ -84,127 +73,157 @@ export default function HangmanGame({ onWin, onFail }: Props) {
   const hasLost = attemptsLeft <= 0;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.fishContainer}>
+    <ImageBackground
+      source={require("../assets/images/statbg.png")}
+      style={styles.background}
+    >
+      <View style={styles.timerContainer}>
+        <Text style={styles.timerText}>⏳ {timeLeft}s</Text>
+      </View>
+
+      <View style={styles.notepadWrapper}>
+        <Image
+          source={require("../assets/images/notepad.png")}
+          style={styles.notepad}
+        />
         <Image
           source={fishImages[wrongLetters.length]}
-          style={{ width: 200, height: 200, resizeMode: "contain" }}
+          style={styles.fishImage}
         />
-        <Text style={styles.word}>{maskedWord}</Text>
+        <Text style={styles.word} numberOfLines={1} adjustsFontSizeToFit>
+          {maskedWord}
+        </Text>
       </View>
 
-      <View style={styles.infoContainer}>
-        <Text style={styles.attempts}>Attempts Left: {attemptsLeft}</Text>
+      <View style={styles.livesContainer}>
+        <Text style={styles.livesText}>Lives Remaining: {attemptsLeft}</Text>
+      </View>
 
-        {!hasWon && !hasLost && (
-          <>
-            <TextInput
-              value={guess}
-              onChangeText={setGuess}
-              maxLength={1}
-              style={styles.input}
-              autoCapitalize="characters"
-            />
-            <TouchableOpacity onPress={handleGuess} style={styles.guessButton}>
-              <Text style={styles.guessButtonText}>Guess</Text>
-            </TouchableOpacity>
-          </>
-        )}
+      {error !== "" && <Text style={styles.error}>{error}</Text>}
+      {hasWon && <Text style={styles.result}>🎉 You win!</Text>}
+      {hasLost && (
+        <Text style={styles.result}>💀 Game over. Word was {word}</Text>
+      )}
 
-        {error !== "" && <Text style={styles.error}>{error}</Text>}
-
-        <View style={styles.usedBoxWrapper}>
-          <Text style={styles.usedLabel}>Used Letters:</Text>
-          <View style={styles.usedBox}>
-            <Text>{wrongLetters.join(", ")}</Text>
-          </View>
+      {!hasWon && !hasLost && (
+        <View style={styles.keyboard}>
+          {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((letter) => {
+            const guessedAlready =
+              guessed.includes(letter) || wrongLetters.includes(letter);
+            return (
+              <TouchableOpacity
+                key={letter}
+                onPress={() => handleGuess(letter)}
+                disabled={guessedAlready}
+                style={[styles.key, guessedAlready && styles.keyUsed]}
+              >
+                <Text
+                  style={[styles.keyText, guessedAlready && styles.keyTextUsed]}
+                >
+                  {letter}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
-
-        {hasWon && <Text style={styles.result}>🎉 You win!</Text>}
-        {hasLost && (
-          <Text style={styles.result}>💀 Game over. Word was {word}</Text>
-        )}
-      </View>
-    </View>
+      )}
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
-    backgroundColor: "#ffc6c6",
-    paddingHorizontal: 24,
-    justifyContent: "center",
+    resizeMode: "cover",
     alignItems: "center",
+    paddingTop: 60,
   },
-  fishContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
-  infoContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-  },
-  word: {
-    fontSize: 32,
-    letterSpacing: 10,
-    marginTop: 12,
-    marginBottom: 24,
-  },
-  attempts: {
-    fontSize: 16,
-    marginBottom: 8,
-  },
-  input: {
-    width: 60,
-    height: 60,
-    fontSize: 28,
-    textAlign: "center",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    backgroundColor: "#fff0f0",
-    marginBottom: 8,
-  },
-  guessButton: {
-    backgroundColor: "#a8ede0",
+  timerContainer: {
+    backgroundColor: "white",
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 10,
-    marginBottom: 16,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginBottom: 10,
   },
-  guessButtonText: {
-    fontWeight: "bold",
-    color: "#000",
-    fontSize: 16,
-  },
-  usedBoxWrapper: {
-    alignItems: "center",
-    marginTop: 8,
-  },
-  usedLabel: {
+  timerText: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "#444",
+  },
+  notepadWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
     marginBottom: 4,
   },
-  usedBox: {
-    backgroundColor: "#ffdede",
-    padding: 12,
-    borderRadius: 12,
+  notepad: {
     width: 280,
-    minHeight: 60,
-    alignItems: "flex-start",
-    justifyContent: "center",
+    height: 350,
+    resizeMode: "contain",
   },
-  result: {
-    fontSize: 20,
+  fishImage: {
+    position: "absolute",
+    top: 50,
+    width: 230,
+    height: 230,
+    resizeMode: "contain",
+  },
+  word: {
+    position: "absolute",
+    bottom: 60,
+    fontSize: 26,
     fontWeight: "bold",
-    marginTop: 16,
+    letterSpacing: 12,
+    color: "black",
+    maxWidth: 240,
+    textAlign: "center",
+  },
+  livesContainer: {
+    backgroundColor: "white",
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderRadius: 999,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  livesText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#222",
   },
   error: {
     color: "red",
     fontSize: 14,
     marginBottom: 8,
+  },
+  result: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 12,
+  },
+  keyboard: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    maxWidth: 320,
+    marginTop: 10,
+  },
+  key: {
+    backgroundColor: "#fff",
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    margin: 4,
+    borderRadius: 20,
+  },
+  keyUsed: {
+    backgroundColor: "#ffdede",
+  },
+  keyText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
+  },
+  keyTextUsed: {
+    color: "#cc4444",
   },
 });
