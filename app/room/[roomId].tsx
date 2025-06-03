@@ -2,6 +2,7 @@
 import Anagram from "@/components/Anagram";
 import BakeryGame from "@/components/BakeryGame";
 import BoutiqueGame from "@/components/BoutiqueGame";
+import CafeGame from "@/components/CafeGame";
 import GamblingGame from "@/components/GamblingGame";
 import HairSalonGame from "@/components/HairSalonGame";
 import HangmanGame from "@/components/HangmanGame";
@@ -9,6 +10,7 @@ import HatGame from "@/components/HatGame";
 import KelpSnake from "@/components/KelpSnake";
 import MuseumGame from "@/components/MuseumGame";
 import OpenUpShop from "@/components/OpenUpShop";
+import SouvenirGame from "@/components/SouvenirGame";
 import TarotGame from "@/components/TarotGame";
 import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
 import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
@@ -106,6 +108,8 @@ export default function RoomScreen() {
     "hair-salon",
     "hat-store",
     "fish-fashion",
+    "fish-cafe",
+    "souvenir-shop",
   ].includes(room.id);
 
   const hasRiddle = !!riddle;
@@ -211,6 +215,18 @@ export default function RoomScreen() {
                   onFail={() => handleGameFail("Nice try!")}
                 />
               )}
+              {room.id === "souvenir-shop" && (
+                <SouvenirGame
+                  onWin={() => handleGameWin("Souvenir Expert!")}
+                  onFail={() => handleGameFail("Nice try!")}
+                />
+              )}
+              {room.id === "fish-cafe" && (
+                <CafeGame
+                  onWin={() => handleGameWin("Latte Master!")}
+                  onFail={() => handleGameFail("Nice try!")}
+                />
+              )}
               {room.id === "open-up-shop" && (
                 <OpenUpShop
                   onWin={() => handleGameWin("You're ready to open!")}
@@ -224,9 +240,7 @@ export default function RoomScreen() {
               )}
               {room.id === "fish-pub" && (
                 <Anagram
-                  onWin={() =>
-                    handleGameWin("You’re not too drunk to read!")
-                  }
+                  onWin={() => handleGameWin("You’re not too drunk to read!")}
                   onFail={() => handleGameFail("Nice try!")}
                 />
               )}

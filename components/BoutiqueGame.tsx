@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+<<<<<<< HEAD
 import GamePopupModal from "./GamePopUpModal";
 
 import color1 from "../assets/images/colors/color1.png";
@@ -19,27 +20,29 @@ import color6 from "../assets/images/colors/color6.png";
 import color7 from "../assets/images/colors/color7.png";
 import color8 from "../assets/images/colors/color8.png";
 import color9 from "../assets/images/colors/color9.png";
+=======
+>>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
 
 const COLOR_IMAGES = [
-  { name: "color1", source: color1 },
-  { name: "color2", source: color2 },
-  { name: "color3", source: color3 },
-  { name: "color4", source: color4 },
-  { name: "color5", source: color5 },
-  { name: "color6", source: color6 },
-  { name: "color7", source: color7 },
-  { name: "color8", source: color8 },
-  { name: "color9", source: color9 },
-  { name: "color10", source: color10 },
-  { name: "color11", source: color11 },
-  { name: "color12", source: color12 },
-  { name: "color13", source: color13 },
-  { name: "color14", source: color14 },
-  { name: "color15", source: color15 },
-  { name: "color16", source: color16 },
+  { name: "color1", source: require("../assets/images/colors/color1.png") },
+  { name: "color2", source: require("../assets/images/colors/color2.png") },
+  { name: "color3", source: require("../assets/images/colors/color3.png") },
+  { name: "color4", source: require("../assets/images/colors/color4.png") },
+  { name: "color5", source: require("../assets/images/colors/color5.png") },
+  { name: "color6", source: require("../assets/images/colors/color6.png") },
+  { name: "color7", source: require("../assets/images/colors/color7.png") },
+  { name: "color8", source: require("../assets/images/colors/color8.png") },
+  { name: "color9", source: require("../assets/images/colors/color9.png") },
+  { name: "color10", source: require("../assets/images/colors/color10.png") },
+  { name: "color11", source: require("../assets/images/colors/color11.png") },
+  { name: "color12", source: require("../assets/images/colors/color12.png") },
+  { name: "color13", source: require("../assets/images/colors/color13.png") },
+  { name: "color14", source: require("../assets/images/colors/color14.png") },
+  { name: "color15", source: require("../assets/images/colors/color15.png") },
+  { name: "color16", source: require("../assets/images/colors/color16.png") },
 ];
 
-function shuffleArray(array) {
+function shuffleArray<T>(array: T[]): T[] {
   const copy = [...array];
   for (let i = copy.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -48,24 +51,36 @@ function shuffleArray(array) {
   return copy;
 }
 
+<<<<<<< HEAD
+=======
+interface ColorItem {
+  name: string;
+  source: any;
+}
+
+>>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
 type Props = {
   onWin: () => void;
   onFail: () => void;
 };
 
 export default function PantoneParade({ onWin, onFail }: Props) {
+<<<<<<< HEAD
   const router = useRouter();
 
+=======
+>>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
   const [round, setRound] = useState(1);
-  const [sequence, setSequence] = useState([]);
-  const [shuffled, setShuffled] = useState([]);
-  const [selected, setSelected] = useState([]);
-  const [isCorrect, setIsCorrect] = useState(null);
+  const [sequence, setSequence] = useState<ColorItem[]>([]);
+  const [shuffled, setShuffled] = useState<ColorItem[]>([]);
+  const [selected, setSelected] = useState<ColorItem[]>([]);
+  const [isCorrect, setIsCorrect] = useState<boolean | string | null>(null);
   const [revealed, setRevealed] = useState(true);
-  const [viewTime, setViewTime] = useState(5);
-  const [playTime, setPlayTime] = useState(15);
+  const [viewTime] = useState(5);
+  const [playTime] = useState(15);
   const [viewTimer, setViewTimer] = useState(5);
   const [playTimer, setPlayTimer] = useState(15);
+<<<<<<< HEAD
   const intervalRef = useRef(null);
   const [showIntro, setShowIntro] = useState(true);
   const [showRules, setShowRules] = useState(false);
@@ -78,8 +93,18 @@ export default function PantoneParade({ onWin, onFail }: Props) {
     }
     return () => clearInterval(intervalRef.current);
   }, [round, gameStarted]);
+=======
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const startRound = (roundNum) => {
+  useEffect(() => {
+    startRound(round);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [round]);
+>>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
+
+  const startRound = (roundNum: number) => {
     const chosen = shuffleArray(COLOR_IMAGES).slice(0, roundNum + 2);
     setSequence(chosen);
     setShuffled(shuffleArray(chosen));
@@ -89,11 +114,11 @@ export default function PantoneParade({ onWin, onFail }: Props) {
     setViewTimer(viewTime);
     setPlayTimer(playTime);
 
-    clearInterval(intervalRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
       setViewTimer((prev) => {
         if (prev === 1) {
-          clearInterval(intervalRef.current);
+          if (intervalRef.current) clearInterval(intervalRef.current);
           setRevealed(false);
           startPlayTimer();
         }
@@ -106,7 +131,7 @@ export default function PantoneParade({ onWin, onFail }: Props) {
     intervalRef.current = setInterval(() => {
       setPlayTimer((prev) => {
         if (prev === 1) {
-          clearInterval(intervalRef.current);
+          if (intervalRef.current) clearInterval(intervalRef.current);
           setIsCorrect(false);
           setShowEndModal(true);
         }
@@ -116,12 +141,13 @@ export default function PantoneParade({ onWin, onFail }: Props) {
     }, 1000);
   };
 
-  const handleSelect = (color) => {
+  const handleSelect = (color: ColorItem) => {
     if (selected.length >= sequence.length || isCorrect !== null) return;
     const updated = [...selected, color];
     setSelected(updated);
     if (updated.length === sequence.length) {
       const correct = updated.every((c, i) => c.name === sequence[i].name);
+<<<<<<< HEAD
       clearInterval(intervalRef.current);
       if (correct) {
         setIsCorrect(true);
@@ -129,6 +155,10 @@ export default function PantoneParade({ onWin, onFail }: Props) {
         setIsCorrect(false);
         setShowEndModal(true);
       }
+=======
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      setIsCorrect(correct);
+>>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
     }
   };
 
@@ -148,11 +178,20 @@ export default function PantoneParade({ onWin, onFail }: Props) {
     }
   };
 
+<<<<<<< HEAD
   const renderColorGrid = () => (
     <View style={styles.grid}>{shuffled.map((c) => renderBlock(c))}</View>
   );
 
   const renderBlock = (item) => (
+=======
+  const handleReset = () => {
+    setRound(1);
+    startRound(1);
+  };
+
+  const renderBlock = (item: ColorItem) => (
+>>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
     <TouchableOpacity
       key={item.name}
       style={styles.imageWrapper}
@@ -167,6 +206,7 @@ export default function PantoneParade({ onWin, onFail }: Props) {
     </TouchableOpacity>
   );
 
+<<<<<<< HEAD
   const handleBackToMap = () => {
     if (isCorrect === "win") {
       onWin();
@@ -175,6 +215,11 @@ export default function PantoneParade({ onWin, onFail }: Props) {
     }
     router.back();
   };
+=======
+  const renderColorGrid = () => (
+    <View style={styles.grid}>{shuffled.map((c) => renderBlock(c))}</View>
+  );
+>>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
 
   return (
     <>
