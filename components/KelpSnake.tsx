@@ -9,8 +9,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import arrow from "../assets/images/kelpass/arrow.png";
-import sun from "../assets/images/kelpass/sun.png";
 
 const CELL_SIZE = 20;
 const GRID_SIZE = 15;
@@ -21,14 +19,14 @@ const INITIAL_SNAKE = [
 ];
 const INITIAL_DIRECTION = { x: 1, y: 0 };
 
-function getRandomFood(snake) {
-  let newFood;
+function getRandomFood(snake: any) {
+  let newFood = { x: 0, y: 0 };
   while (true) {
     newFood = {
       x: Math.floor(Math.random() * GRID_SIZE),
       y: Math.floor(Math.random() * GRID_SIZE),
     };
-    if (!snake.some((s) => s.x === newFood.x && s.y === newFood.y)) {
+    if (!snake.some((s: any) => s.x === newFood.x && s.y === newFood.y)) {
       return newFood;
     }
   }
@@ -36,9 +34,10 @@ function getRandomFood(snake) {
 
 type Props = {
   onWin: () => void;
+  onFail: () => void;
 };
 
-export default function KelpSnake({ onWin }: Props) {
+export default function KelpSnake({ onWin, onFail }: Props) {
   const [snake, setSnake] = useState(INITIAL_SNAKE);
   const [direction, setDirection] = useState(INITIAL_DIRECTION);
   const [food, setFood] = useState(getRandomFood(INITIAL_SNAKE));
@@ -71,7 +70,10 @@ export default function KelpSnake({ onWin }: Props) {
   }, []);
 
   useEffect(() => {
-    if (gameOver) return;
+    if (gameOver) {
+      onFail();
+      return;
+    }
 
     const interval = setInterval(() => {
       setSnake((prev) => {
@@ -128,7 +130,7 @@ export default function KelpSnake({ onWin }: Props) {
     if (isFood) {
       content = (
         <Image
-          source={sun}
+          source={require("../assets/images/kelpass/sun.png")}
           style={{ width: CELL_SIZE - 4, height: CELL_SIZE - 4 }}
         />
       );
@@ -148,7 +150,7 @@ export default function KelpSnake({ onWin }: Props) {
   const renderArrow = (rotation: string, onPress: () => void) => (
     <TouchableOpacity onPress={onPress}>
       <Image
-        source={arrow}
+        source={require("../assets/images/kelpass/arrow.png")}
         style={{
           width: 40,
           height: 40,
