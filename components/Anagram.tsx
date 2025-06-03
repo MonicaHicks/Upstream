@@ -1,5 +1,6 @@
 import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
 import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -9,8 +10,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 import pubmenu from "../assets/images/pubmenu.png";
+import GamePopupModal from "./GamePopUpModal";
 
 const fullWordList = [
   { scrambled: "AVITIR", answer: "TRIVIA" },
@@ -32,30 +33,38 @@ type Props = {
 };
 
 export default function AnagramGame({ onWin, onFail }: Props) {
-  const [step, setStep] = useState<"intro" | "game" | "done">("intro");
+  const router = useRouter();
+  const [step, setStep] = useState<"intro" | "rules" | "game" | "done">(
+    "intro"
+  );
   const [inputs, setInputs] = useState(["", ""]);
-  const [timeLeft, setTimeLeft] = useState(100);
+  const [timeLeft, setTimeLeft] = useState(30);
   const [selectedWords, setSelectedWords] = useState(() =>
     getRandomSubset(fullWordList, 2)
   );
-  let [fontsLoaded] = useFonts({
-    Cinzel_900Black,
-  });
+  const [showEndModal, setShowEndModal] = useState(false);
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+
+  let [fontsLoaded] = useFonts({ Cinzel_900Black });
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (step === "game" && timeLeft > 0) {
       timer = setTimeout(() => setTimeLeft((prev) => prev - 1), 1000);
     } else if (timeLeft === 0) {
+      setIsCorrect(false);
+      setShowEndModal(true);
       setStep("done");
     }
     return () => clearTimeout(timer);
   }, [step, timeLeft]);
 
-  const handleStart = () => {
+  const handleStart = () => setStep("rules");
+
+  const handleBeginGame = () => {
     setSelectedWords(getRandomSubset(fullWordList, 2));
     setInputs(["", ""]);
-    setTimeLeft(100);
+    setTimeLeft(30);
     setStep("game");
   };
 
@@ -69,27 +78,50 @@ export default function AnagramGame({ onWin, onFail }: Props) {
     const correct = inputs.every(
       (input, i) => input === selectedWords[i].answer.toUpperCase()
     );
+    setIsCorrect(correct);
+    setShowEndModal(true);
+    setStep("done");
     if (correct) {
       onWin();
     } else {
-      setStep("done");
       onFail();
     }
   };
 
+  const handleBackToMap = () => {
+    if (isCorrect) {
+      onWin();
+    } else {
+      onFail();
+    }
+    router.back();
+  };
+
   if (step === "intro") {
     return (
-      <View style={styles.screen}>
-        <View style={styles.introRow}>
-          <Text style={styles.bubbleIntro}>
-            You want a token?{"\n"}Gotta earn it.{"\n\n"}If you're too drunk to
-            read the menu,{"\n"}I'll cut you off!
-          </Text>
-        </View>
-        <TouchableOpacity style={styles.button} onPress={handleStart}>
-          <Text style={styles.buttonText}>I’m Ready!</Text>
-        </TouchableOpacity>
-      </View>
+      <GamePopupModal
+        visible={true}
+        imageSrc={require("../assets/images/shopowners/happypub.png")}
+        message={
+          "You want a token?\nGotta earn it.\n\nIf you're too drunk to read the menu,\nI'll cut you off!"
+        }
+        onClose={handleStart}
+        buttonText="Next"
+      />
+    );
+  }
+
+  if (step === "rules") {
+    return (
+      <GamePopupModal
+        visible={true}
+        imageSrc={require("../assets/images/shopowners/happypub.png")}
+        message={
+          "Unscramble the drinks on the menu.\n Tap on the empty line to type your guess. \n Get both right to win!"
+        }
+        onClose={handleBeginGame}
+        buttonText="Start Game"
+      />
     );
   }
 
@@ -122,13 +154,23 @@ export default function AnagramGame({ onWin, onFail }: Props) {
   }
 
   return (
-    <View style={styles.screen}>
-      <Image source={pubmenu} style={styles.backgroundImage} />
-      <Text style={styles.bubbleCutoff}>🍻 You're cut off!</Text>
-    </View>
+    <GamePopupModal
+      visible={true}
+      imageSrc={
+        isCorrect
+          ? require("../assets/images/shopowners/happypub.png")
+          : require("../assets/images/shopowners/sadpub.png")
+      }
+      message={
+        isCorrect
+          ? "Cheers! You nailed the order. Here's your token!"
+          : "You're cut off! Better luck next round."
+      }
+      onClose={handleBackToMap}
+      buttonText="Back to Map"
+    />
   );
 }
-
 const styles = StyleSheet.create({
   screen: {
     flex: 1,

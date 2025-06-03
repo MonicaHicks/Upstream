@@ -1,5 +1,6 @@
 import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
 import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -9,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import GamePopupModal from "./GamePopUpModal";
 
 const TILE_COUNT = 16;
 const COLUMNS = 4;
@@ -40,6 +42,10 @@ type Props = {
 };
 
 export default function MuseumGame({ onWin, onFail }: Props) {
+  const router = useRouter();
+  const [step, setStep] = useState<"intro" | "rules" | "game" | "done">(
+    "intro"
+  );
   const [gameOver, setGameOver] = useState(false);
   const [rotations, setRotations] = useState<number[]>(
     Array(TILE_COUNT)
@@ -47,31 +53,38 @@ export default function MuseumGame({ onWin, onFail }: Props) {
       .map(() => [0, 90, 180, 270][Math.floor(Math.random() * 4)])
   );
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
-  let [fontsLoaded] = useFonts({
-    Cinzel_900Black,
-  });
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+
+  let [fontsLoaded] = useFonts({ Cinzel_900Black });
 
   useEffect(() => {
+    if (step !== "game") return;
+
     const timer = setInterval(() => {
       setTimeLeft((t) => {
         if (t === 1) {
           clearInterval(timer);
           setGameOver(true);
+          setIsCorrect(false);
+          setStep("done");
         }
         return t > 0 ? t - 1 : 0;
       });
     }, 1000);
+
     return () => clearInterval(timer);
-  }, []);
+  }, [step]);
 
   useEffect(() => {
-    if (!gameOver && rotations.every((r) => r === 0)) {
+    if (step === "game" && rotations.every((r) => r === 0)) {
+      setIsCorrect(true);
+      setStep("done");
       onWin();
     }
-  }, [rotations]);
+  }, [rotations, step]);
 
   const rotateTile = (index: number) => {
-    if (gameOver) return;
+    if (step !== "game" || gameOver) return;
     setRotations((prev) => {
       const newRotations = [...prev];
       newRotations[index] = (newRotations[index] + 90) % 360;
@@ -79,14 +92,58 @@ export default function MuseumGame({ onWin, onFail }: Props) {
     });
   };
 
-  if (gameOver) {
-    onFail();
+  const handleBackToMap = () => {
+    if (isCorrect) {
+      onWin();
+    } else {
+      onFail();
+    }
+    router.back();
+  };
+
+  if (step === "intro") {
     return (
-      <View style={styles.centeredScreen}>
-        <Text style={styles.gameOverText}>
-          🦴 You took too long… the fossil’s turned to dust!
-        </Text>
-      </View>
+      <GamePopupModal
+        visible={true}
+        imageSrc={require("../assets/images/shopowners/happymuseum.png")}
+        message={
+          "Welcome to the Museum!\n\n I'm the archeologist, I'd like a hand uncovering a fossil!"
+        }
+        onClose={() => setStep("rules")}
+        buttonText="Next"
+      />
+    );
+  }
+
+  if (step === "rules") {
+    return (
+      <GamePopupModal
+        visible={true}
+        imageSrc={require("../assets/images/shopowners/happymuseum.png")}
+        message="Tap to rotate the tiles. Uncover the fossil before time runs out!"
+        onClose={() => setStep("game")}
+        buttonText="Start Digging!"
+      />
+    );
+  }
+
+  if (step === "done") {
+    return (
+      <GamePopupModal
+        visible={true}
+        imageSrc={
+          isCorrect
+            ? require("../assets/images/shopowners/happymuseum.png")
+            : require("../assets/images/shopowners/sadmuseum.png")
+        }
+        message={
+          isCorrect
+            ? "You restored the fossil! Here's your token!"
+            : "🦴 You took too long… the fossil’s turned to dust!"
+        }
+        onClose={handleBackToMap}
+        buttonText="Back to Map"
+      />
     );
   }
 
@@ -140,41 +197,22 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   timerText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  frameArea: {
-    marginTop: 220, //i adjust this
-    width: TILE_SIZE * COLUMNS,
-    height: TILE_SIZE * COLUMNS,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    width: TILE_SIZE * COLUMNS,
-  },
-  timerText: {
     fontSize: 28,
     fontWeight: "bold",
     fontFamily: "Cinzel_900Black",
     color: "#004c3f",
   },
-  centeredScreen: {
-    flex: 1,
+  frameArea: {
+    marginTop: 220,
+    width: TILE_SIZE * COLUMNS,
+    height: TILE_SIZE * COLUMNS,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#A9D5C7",
-    padding: 30,
   },
-  gameOverText: {
-    fontSize: 24,
-    fontWeight: "600",
-    fontFamily: "Cinzel_900Black",
-    textAlign: "center",
-    color: "#004c3f",
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    width: TILE_SIZE * COLUMNS,
+    bottom: 70,
   },
 });

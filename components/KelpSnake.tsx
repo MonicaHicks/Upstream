@@ -1,5 +1,6 @@
 import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
 import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -11,6 +12,7 @@ import {
 } from "react-native";
 import arrow from "../assets/images/kelpass/arrow.png";
 import sun from "../assets/images/kelpass/sun.png";
+import GamePopupModal from "./GamePopUpModal";
 
 const CELL_SIZE = 20;
 const GRID_SIZE = 15;
@@ -39,10 +41,16 @@ type Props = {
 };
 
 export default function KelpSnake({ onWin }: Props) {
+  const router = useRouter();
   const [snake, setSnake] = useState(INITIAL_SNAKE);
   const [direction, setDirection] = useState(INITIAL_DIRECTION);
   const [food, setFood] = useState(getRandomFood(INITIAL_SNAKE));
   const [gameOver, setGameOver] = useState(false);
+  const [hasWon, setHasWon] = useState(false);
+  const [step, setStep] = useState<"intro" | "rules" | "game" | "done">(
+    "intro"
+  );
+
   let [fontsLoaded] = useFonts({
     Cinzel_900Black,
   });
@@ -71,7 +79,7 @@ export default function KelpSnake({ onWin }: Props) {
   }, []);
 
   useEffect(() => {
-    if (gameOver) return;
+    if (step !== "game" || gameOver || hasWon) return;
 
     const interval = setInterval(() => {
       setSnake((prev) => {
@@ -88,6 +96,7 @@ export default function KelpSnake({ onWin }: Props) {
           prev.some((s) => s.x === newHead.x && s.y === newHead.y)
         ) {
           setGameOver(true);
+          setStep("done");
           return prev;
         }
 
@@ -105,13 +114,19 @@ export default function KelpSnake({ onWin }: Props) {
     }, GAME_TICK_MS);
 
     return () => clearInterval(interval);
-  }, [direction, food, gameOver]);
+  }, [direction, food, step]);
 
   useEffect(() => {
-    if (!gameOver && snake.length >= 10) {
+    if (!gameOver && snake.length >= 10 && !hasWon) {
+      setHasWon(true);
+      setStep("done");
       onWin();
     }
-  }, [snake, gameOver]);
+  }, [snake]);
+
+  const handleBackToMap = () => {
+    router.back();
+  };
 
   const handleArrow = (dx: number, dy: number) => {
     setDirection({ x: dx, y: dy });
@@ -160,11 +175,55 @@ export default function KelpSnake({ onWin }: Props) {
 
   return (
     <View style={styles.screen}>
-      <Text style={styles.lengthText}>Length: {snake.length}</Text>
-      {gameOver ? (
-        <Text style={styles.gameOverText}>🌱 The kelp wilted!</Text>
-      ) : (
+      {/* Intro Modal */}
+      {step === "intro" && (
+        <GamePopupModal
+          visible={true}
+          imageSrc={require("../assets/images/shopowners/happykelp.png")}
+          message={
+            "I'm the kelp gardener!\n\nMy kelp is having a hard time getting enough sun at this depth-\n\n can you help? 🌱"
+          }
+          onClose={() => setStep("rules")}
+          buttonText="Next"
+        />
+      )}
+
+      {/* Rules Modal */}
+      {step === "rules" && (
+        <GamePopupModal
+          visible={true}
+          imageSrc={require("../assets/images/shopowners/happykelp.png")}
+          message={
+            "Use the orange arrows to guide the kelp to the sun.\n\nBe careful not to let the kelp touch itself or the walls.\n\n Reach 10 segments to win!"
+          }
+          onClose={() => setStep("game")}
+          buttonText="Start Growing!"
+        />
+      )}
+
+      {/* End Modal */}
+      {step === "done" && (
+        <GamePopupModal
+          visible={true}
+          imageSrc={
+            hasWon
+              ? require("../assets/images/shopowners/happykelp.png")
+              : require("../assets/images/shopowners/sadkelp.png")
+          }
+          message={
+            hasWon
+              ? "You did it! That kelp is thriving 🪴"
+              : "Oh no! The kelp wilted. Better luck next time 🌊"
+          }
+          onClose={handleBackToMap}
+          buttonText="Back to Map"
+        />
+      )}
+
+      {/* Game UI */}
+      {step === "game" && (
         <>
+          <Text style={styles.lengthText}>Length: {snake.length}</Text>
           <View style={styles.gridWrapper}>
             <View style={styles.grid}>
               {[...Array(GRID_SIZE)].flatMap((_, y) =>
@@ -232,18 +291,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 24,
-  },
-  arrow: {
-    fontSize: 40,
-    fontFamily: "Cinzel_900Black",
-    padding: 4,
-  },
-  gameOverText: {
-    fontSize: 28,
-    fontWeight: "bold",
-    fontFamily: "Cinzel_900Black",
-    color: "#444",
-    textAlign: "center",
   },
   lengthText: {
     fontSize: 20,

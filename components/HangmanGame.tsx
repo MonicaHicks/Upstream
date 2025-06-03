@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -7,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import GamePopupModal from "./GamePopUpModal";
 
 const fishImages = [
   require("../assets/images/group1.png"),
@@ -21,113 +23,165 @@ const fishImages = [
 
 const WORDS = ["PENCIL", "PAPER", "RULER", "MARKER", "CRAYON", "WASHI"];
 
-type Props = {
-  onWin: () => void;
-  onFail: () => void;
-};
-
-export default function HangmanGame({ onWin, onFail }: Props) {
+export default function HangmanGame({ onWin, onFail }) {
+  const router = useRouter();
   const [word] = useState(WORDS[Math.floor(Math.random() * WORDS.length)]);
-  const [guessed, setGuessed] = useState<string[]>([]);
+  const [guessed, setGuessed] = useState([]);
   const [attemptsLeft, setAttemptsLeft] = useState(7);
-  const [wrongLetters, setWrongLetters] = useState<string[]>([]);
+  const [wrongLetters, setWrongLetters] = useState([]);
   const [error, setError] = useState("");
   const [timeLeft, setTimeLeft] = useState(60);
+  const [step, setStep] = useState("intro"); // now includes rules
+  const [isCorrect, setIsCorrect] = useState(null);
 
   useEffect(() => {
-    if (timeLeft <= 0) {
-      onFail();
-      return;
+    if (step === "game" && timeLeft > 0) {
+      const timer = setTimeout(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (timeLeft === 0) {
+      setIsCorrect(false);
+      setStep("done");
     }
-    const timer = setTimeout(() => {
-      setTimeLeft((prev) => prev - 1);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [timeLeft]);
+  }, [timeLeft, step]);
 
   const maskedWord = word
     .split("")
     .map((letter) => (guessed.includes(letter) ? letter : "_"))
     .join(" ");
 
-  const handleGuess = (input: string) => {
+  const handleGuess = (input) => {
     const upper = input.toUpperCase();
     if (guessed.includes(upper) || wrongLetters.includes(upper)) return;
 
     if (word.includes(upper)) {
       const newGuessed = [...guessed, upper];
       setGuessed(newGuessed);
-      if (word.split("").every((l) => newGuessed.includes(l))) onWin();
+      if (word.split("").every((l) => newGuessed.includes(l))) {
+        setIsCorrect(true);
+        setStep("done");
+      }
     } else {
       const newWrong = [...wrongLetters, upper];
       const remaining = attemptsLeft - 1;
       setWrongLetters(newWrong);
       setAttemptsLeft(remaining);
-      if (remaining <= 0) onFail();
+      if (remaining <= 0) {
+        setIsCorrect(false);
+        setStep("done");
+      }
     }
-
     setError("");
   };
 
-  const hasWon = word.split("").every((l) => guessed.includes(l));
-  const hasLost = attemptsLeft <= 0;
+  const handleBackToMap = () => {
+    if (isCorrect) {
+      onWin();
+    } else {
+      onFail();
+    }
+    router.back();
+  };
 
   return (
-    <ImageBackground
-      source={require("../assets/images/statbg.png")}
-      style={styles.background}
-    >
-      <View style={styles.timerContainer}>
-        <Text style={styles.timerText}>⏳ {timeLeft}s</Text>
-      </View>
+    <>
+      {/* Intro modal */}
+      <GamePopupModal
+        visible={step === "intro"}
+        imageSrc={require("../assets/images/shopowners/happystationery.png")}
+        message={
+          "Welcome to the Stationery Shop!\n\nYou're in luck, we just got new pens.\n\nCare to quality-test them with some hangfish?"
+        }
+        onClose={() => setStep("rules")}
+        buttonText="Next"
+      />
 
-      <View style={styles.notepadWrapper}>
-        <Image
-          source={require("../assets/images/notepad.png")}
-          style={styles.notepad}
-        />
-        <Image
-          source={fishImages[wrongLetters.length]}
-          style={styles.fishImage}
-        />
-        <Text style={styles.word} numberOfLines={1} adjustsFontSizeToFit>
-          {maskedWord}
-        </Text>
-      </View>
+      {/* Rules modal */}
+      <GamePopupModal
+        visible={step === "rules"}
+        imageSrc={require("../assets/images/shopowners/happystationery.png")}
+        message={
+          "Tap on a button to guess a letter. You have 7 guesses and 60 seconds.\nEach wrong guess brings the fish closer to death.\n\nCan you guess the word in time?"
+        }
+        onClose={() => setStep("game")}
+        buttonText="Start Game"
+      />
 
-      <View style={styles.livesContainer}>
-        <Text style={styles.livesText}>Lives Remaining: {attemptsLeft}</Text>
-      </View>
+      {/* End modal */}
+      <GamePopupModal
+        visible={step === "done"}
+        imageSrc={
+          isCorrect
+            ? require("../assets/images/shopowners/happystationery.png")
+            : require("../assets/images/shopowners/sadstationery.png")
+        }
+        message={
+          isCorrect
+            ? "🎉 You saved the stationery!\nSharp thinking!"
+            : `🫣 The fish DIED...\nThe word was: ${word}`
+        }
+        onClose={handleBackToMap}
+        buttonText="Back to Map"
+      />
 
-      {error !== "" && <Text style={styles.error}>{error}</Text>}
-      {hasWon && <Text style={styles.result}>🎉 You win!</Text>}
-      {hasLost && (
-        <Text style={styles.result}>💀 Game over. Word was {word}</Text>
-      )}
+      {step === "game" && (
+        <ImageBackground
+          source={require("../assets/images/statbg.png")}
+          style={styles.background}
+        >
+          <View style={styles.timerContainer}>
+            <Text style={styles.timerText}>⏳ {timeLeft}s</Text>
+          </View>
 
-      {!hasWon && !hasLost && (
-        <View style={styles.keyboard}>
-          {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((letter) => {
-            const guessedAlready =
-              guessed.includes(letter) || wrongLetters.includes(letter);
-            return (
-              <TouchableOpacity
-                key={letter}
-                onPress={() => handleGuess(letter)}
-                disabled={guessedAlready}
-                style={[styles.key, guessedAlready && styles.keyUsed]}
-              >
-                <Text
-                  style={[styles.keyText, guessedAlready && styles.keyTextUsed]}
+          <View style={styles.notepadWrapper}>
+            <Image
+              source={require("../assets/images/notepad.png")}
+              style={styles.notepad}
+            />
+            <Image
+              source={fishImages[wrongLetters.length]}
+              style={styles.fishImage}
+            />
+            <Text style={styles.word} numberOfLines={1} adjustsFontSizeToFit>
+              {maskedWord}
+            </Text>
+          </View>
+
+          <View style={styles.livesContainer}>
+            <Text style={styles.livesText}>
+              Lives Remaining: {attemptsLeft}
+            </Text>
+          </View>
+
+          {error !== "" && <Text style={styles.error}>{error}</Text>}
+
+          <View style={styles.keyboard}>
+            {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((letter) => {
+              const guessedAlready =
+                guessed.includes(letter) || wrongLetters.includes(letter);
+              return (
+                <TouchableOpacity
+                  key={letter}
+                  onPress={() => handleGuess(letter)}
+                  disabled={guessedAlready}
+                  style={[styles.key, guessedAlready && styles.keyUsed]}
                 >
-                  {letter}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+                  <Text
+                    style={[
+                      styles.keyText,
+                      guessedAlready && styles.keyTextUsed,
+                    ]}
+                  >
+                    {letter}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </ImageBackground>
       )}
-    </ImageBackground>
+    </>
   );
 }
 
@@ -195,11 +249,6 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 14,
     marginBottom: 8,
-  },
-  result: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 12,
   },
   keyboard: {
     flexDirection: "row",

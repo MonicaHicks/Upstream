@@ -3,8 +3,7 @@
 //You are cutting hair. The "pipes" are hair, and the different colored hair pieces
 //are "dead hair" that you are cutting. Cut 10 to win (will likely reduce this down to 6-8)
 
-import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
-import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
+import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
@@ -15,28 +14,20 @@ import {
   View,
 } from "react-native";
 
-// @ts-ignore
 import chopped from "../assets/images/hairassets/chopped.png";
-// @ts-ignore
 import deadHair from "../assets/images/hairassets/dead.png";
-// @ts-ignore
 import healthyEnd from "../assets/images/hairassets/healthyend.png";
-// @ts-ignore
 import healthyTop from "../assets/images/hairassets/healthytop.png";
-// @ts-ignore
 import background from "../assets/images/hairassets/hsmobile.png";
-// @ts-ignore
 import scissorsImg from "../assets/images/hairassets/hss.png";
-// @ts-ignore
 import topcut from "../assets/images/hairassets/topcut.png";
 
-import hairLoss from "../assets/images/hairassets/hairloss.png";
-import hairWin from "../assets/images/hairassets/hairwin.png";
-import intro1 from "../assets/images/hairassets/intro.png";
-import intro2 from "../assets/images/hairassets/intro2.png";
+import happySalon from "../assets/images/shopowners/happysalon.png";
+import sadSalon from "../assets/images/shopowners/sadsalon.png";
+import GamePopupModal from "./GamePopUpModal";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
-const SCREEN_HEIGHT = Dimensions.get("window").height;
+const GAME_HEIGHT = 500;
 
 const GRAVITY = 2;
 const FLAP_VELOCITY = -20;
@@ -44,10 +35,8 @@ const OBSTACLE_WIDTH = 60;
 const OBSTACLE_GAP = 180;
 const OBSTACLE_SPEED = 5;
 const INTERVAL = 50;
-
 const MIN_HEIGHT = 80;
 const NUM_OBSTACLES = 2;
-const GAME_HEIGHT = 500;
 const SCISSOR_HITBOX_OFFSET = 10;
 
 type Props = {
@@ -56,16 +45,22 @@ type Props = {
 };
 
 export default function HairSalonGame({ onWin, onFail }: Props) {
+  const router = useRouter();
   const MAX_HEIGHT = GAME_HEIGHT - 200;
 
-  const [screenIndex, setScreenIndex] = useState<
-    "intro1" | "intro2" | "game" | "win" | "loss"
-  >("intro1");
-
+  const [step, setStep] = useState<"intro" | "rules" | "game" | "done">(
+    "intro"
+  );
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [scissorY, setScissorY] = useState(GAME_HEIGHT / 2);
   const [velocity, setVelocity] = useState(0);
-  const [obstacles, setObstacles] = useState(
-    Array.from({ length: NUM_OBSTACLES }).map((_, i) => {
+  const [score, setScore] = useState(0);
+  const [obstacles, setObstacles] = useState(generateObstacles());
+
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  function generateObstacles() {
+    return Array.from({ length: NUM_OBSTACLES }).map((_, i) => {
       const topHeight = Math.floor(
         MIN_HEIGHT + Math.random() * (MAX_HEIGHT - OBSTACLE_GAP - MIN_HEIGHT)
       );
@@ -74,41 +69,15 @@ export default function HairSalonGame({ onWin, onFail }: Props) {
         topHeight,
         cut: false,
       };
-    })
-  );
-  const [score, setScore] = useState(0);
-  const [gameOver, setGameOver] = useState(false);
-  let [fontsLoaded] = useFonts({
-    Cinzel_900Black,
-  });
-
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    });
+  }
 
   const flap = () => {
     setVelocity(FLAP_VELOCITY);
   };
 
-  const resetGame = () => {
-    setScissorY(GAME_HEIGHT / 2);
-    setVelocity(0);
-    setScore(0);
-    setGameOver(false);
-    setObstacles(
-      Array.from({ length: NUM_OBSTACLES }).map((_, i) => {
-        const topHeight = Math.floor(
-          MIN_HEIGHT + Math.random() * (MAX_HEIGHT - OBSTACLE_GAP - MIN_HEIGHT)
-        );
-        return {
-          x: SCREEN_WIDTH + i * 250,
-          topHeight,
-          cut: false,
-        };
-      })
-    );
-  };
-
   useEffect(() => {
-    if (screenIndex !== "game") return;
+    if (step !== "game") return;
 
     intervalRef.current = setInterval(() => {
       setVelocity((v) => v + GRAVITY);
@@ -146,10 +115,10 @@ export default function HairSalonGame({ onWin, onFail }: Props) {
     }, INTERVAL);
 
     return () => clearInterval(intervalRef.current!);
-  }, [velocity, screenIndex]);
+  }, [velocity, step]);
 
   useEffect(() => {
-    if (screenIndex !== "game") return;
+    if (step !== "game") return;
 
     for (const obs of obstacles) {
       const inXRange = obs.x < 90 && obs.x + OBSTACLE_WIDTH > 60;
@@ -158,130 +127,155 @@ export default function HairSalonGame({ onWin, onFail }: Props) {
         scissorY - SCISSOR_HITBOX_OFFSET > obs.topHeight + OBSTACLE_GAP;
 
       if (inXRange && inYRange) {
-        setGameOver(true);
         clearInterval(intervalRef.current!);
-        setScreenIndex("loss");
+        setIsCorrect(false);
+        setStep("done");
+        return;
       }
     }
 
     if (score >= 10) {
       clearInterval(intervalRef.current!);
-      setScreenIndex("win");
+      setIsCorrect(true);
+      setStep("done");
     }
-  }, [obstacles, scissorY, screenIndex]);
+  }, [obstacles, scissorY]);
 
-  const renderOverlayScreen = (
-    img: any,
-    nextAction?: () => void,
-    buttonLabel?: string
-  ) => (
-    <View style={styles.overlayScreen}>
-      <Image source={img} style={styles.overlayImage} />
-      {nextAction && buttonLabel ? (
-        <TouchableOpacity style={styles.startButton} onPress={nextAction}>
-          <Text style={styles.startButtonText}>{buttonLabel}</Text>
-        </TouchableOpacity>
-      ) : null}
-    </View>
-  );
-
-  if (screenIndex === "intro1")
-    return renderOverlayScreen(intro1, () => setScreenIndex("intro2"), "NEXT");
-  if (screenIndex === "intro2")
-    return renderOverlayScreen(
-      intro2,
-      () => setScreenIndex("game"),
-      "I'M READY!"
-    );
-  if (screenIndex === "win") return renderOverlayScreen(hairWin);
-  if (screenIndex === "loss") return renderOverlayScreen(hairLoss);
+  const handleBackToMap = () => {
+    if (isCorrect) {
+      onWin();
+    } else {
+      onFail();
+    }
+    router.back();
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.score}>Snips: {score}</Text>
+    <>
+      {/* Intro modal */}
+      <GamePopupModal
+        visible={step === "intro"}
+        imageSrc={happySalon}
+        message={
+          "Girl, this hairstylist needs a break!\n\n Care to lend a hand with split ends and bad dye jobs? \n"
+        }
+        onClose={() => setStep("rules")}
+        buttonText="Next"
+      />
 
-      <View style={styles.gameArea}>
-        <Image source={background} style={StyleSheet.absoluteFill} />
+      {/* Rules modal */}
+      <GamePopupModal
+        visible={step === "rules"}
+        imageSrc={happySalon}
+        message={
+          "Every tap makes your scissors jump.\n\n Cut through the dead hair: gray and stringy sections. \n\n Avoid golden, healthy hair, go through 10 clean snips to win!"
+        }
+        onClose={() => setStep("game")}
+        buttonText="Start Game"
+      />
 
-        <TouchableOpacity
-          onPress={flap}
-          style={styles.touchArea}
-          activeOpacity={1}
-        >
-          {obstacles.map((obs, idx) => {
-            const isCut = obs.cut;
+      {/* End modal */}
+      <GamePopupModal
+        visible={step === "done"}
+        imageSrc={isCorrect ? happySalon : sadSalon}
+        message={
+          isCorrect
+            ? "💇‍♀️ Fabulous work, stylist! The salon is saved!"
+            : "✂️ Yikes! That cut went wrong. Try again, stylist."
+        }
+        onClose={handleBackToMap}
+        buttonText="Back to Map"
+      />
 
-            return (
-              <React.Fragment key={idx}>
+      {/* Game screen */}
+      {step === "game" && (
+        <View style={styles.container}>
+          <Text style={styles.score}>Snips: {score}</Text>
+          <View style={styles.gameArea}>
+            <Image source={background} style={StyleSheet.absoluteFill} />
+
+            <TouchableOpacity
+              onPress={flap}
+              style={styles.touchArea}
+              activeOpacity={1}
+            >
+              {obstacles.map((obs, idx) => {
+                const isCut = obs.cut;
+
+                return (
+                  <React.Fragment key={idx}>
+                    <Image
+                      source={isCut ? topcut : healthyTop}
+                      style={[
+                        styles.obstacle,
+                        {
+                          height: obs.topHeight + 20,
+                          top: -20,
+                          left: obs.x,
+                          resizeMode: "stretch",
+                        },
+                      ]}
+                    />
+                    <Image
+                      source={isCut ? chopped : healthyEnd}
+                      style={[
+                        styles.obstacle,
+                        {
+                          height:
+                            GAME_HEIGHT - obs.topHeight - OBSTACLE_GAP + 20,
+                          top: obs.topHeight + OBSTACLE_GAP,
+                          left: obs.x,
+                          resizeMode: "stretch",
+                        },
+                      ]}
+                    />
+                    {!isCut && (
+                      <Image
+                        source={deadHair}
+                        style={{
+                          position: "absolute",
+                          top: obs.topHeight,
+                          height: OBSTACLE_GAP,
+                          left: obs.x - 1.5,
+                          width: OBSTACLE_WIDTH,
+                          resizeMode: "stretch",
+                        }}
+                      />
+                    )}
+                  </React.Fragment>
+                );
+              })}
+
+              <View
+                style={{
+                  position: "absolute",
+                  top: scissorY + 5,
+                  left: 65,
+                  width: 20,
+                  height: 20,
+                  borderWidth: 1,
+                  borderColor: "gray",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <Image
-                  source={isCut ? topcut : healthyTop}
-                  style={[
-                    styles.obstacle,
-                    {
-                      height: obs.topHeight + 20,
-                      top: -20,
-                      left: obs.x,
-                      resizeMode: "stretch",
-                    },
-                  ]}
+                  source={scissorsImg}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    resizeMode: "contain",
+                    position: "absolute",
+                    top: -10,
+                    left: -10,
+                  }}
                 />
-                <Image
-                  source={isCut ? chopped : healthyEnd}
-                  style={[
-                    styles.obstacle,
-                    {
-                      height: GAME_HEIGHT - obs.topHeight - OBSTACLE_GAP + 20,
-                      top: obs.topHeight + OBSTACLE_GAP,
-                      left: obs.x,
-                      resizeMode: "stretch",
-                    },
-                  ]}
-                />
-                {!isCut && (
-                  <Image
-                    source={deadHair}
-                    style={{
-                      position: "absolute",
-                      top: obs.topHeight,
-                      height: OBSTACLE_GAP,
-                      left: obs.x - 1.5,
-                      width: OBSTACLE_WIDTH,
-                      resizeMode: "stretch",
-                    }}
-                  />
-                )}
-              </React.Fragment>
-            );
-          })}
-
-          <View
-            style={{
-              position: "absolute",
-              top: scissorY + 5,
-              left: 65,
-              width: 20,
-              height: 20,
-              borderWidth: 1,
-              borderColor: "gray",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              source={scissorsImg}
-              style={{
-                width: 40,
-                height: 40,
-                resizeMode: "contain",
-                position: "absolute",
-                top: -10,
-                left: -10,
-              }}
-            />
+              </View>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      </View>
-    </View>
+        </View>
+      )}
+    </>
   );
 }
 
@@ -315,42 +309,7 @@ const styles = StyleSheet.create({
   score: {
     fontSize: 22,
     fontWeight: "bold",
-    fontFamily: "Cinzel_900Black",
     color: "#004c3f",
     marginBottom: 12,
-  },
-  overlayScreen: {
-    width: "90%",
-    height: GAME_HEIGHT,
-    fontFamily: "Cinzel_900Black",
-    alignSelf: "center",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    backgroundColor: "black",
-    overflow: "hidden",
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#ccc",
-    marginTop: 20,
-  },
-  overlayImage: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
-  },
-  startButton: {
-    backgroundColor: "#FFA726",
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 28,
-    marginBottom: 16,
-    zIndex: 2,
-  },
-  startButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontFamily: "Cinzel_900Black",
-    fontSize: 16,
   },
 });

@@ -1,5 +1,8 @@
+import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import GamePopupModal from "./GamePopUpModal";
+
 import color1 from "../assets/images/colors/color1.png";
 import color10 from "../assets/images/colors/color10.png";
 import color11 from "../assets/images/colors/color11.png";
@@ -45,7 +48,14 @@ function shuffleArray(array) {
   return copy;
 }
 
-export default function PantoneParade() {
+type Props = {
+  onWin: () => void;
+  onFail: () => void;
+};
+
+export default function PantoneParade({ onWin, onFail }: Props) {
+  const router = useRouter();
+
   const [round, setRound] = useState(1);
   const [sequence, setSequence] = useState([]);
   const [shuffled, setShuffled] = useState([]);
@@ -57,11 +67,17 @@ export default function PantoneParade() {
   const [viewTimer, setViewTimer] = useState(5);
   const [playTimer, setPlayTimer] = useState(15);
   const intervalRef = useRef(null);
+  const [showIntro, setShowIntro] = useState(true);
+  const [showRules, setShowRules] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [showEndModal, setShowEndModal] = useState(false);
 
   useEffect(() => {
-    startRound(round);
+    if (gameStarted) {
+      startRound(round);
+    }
     return () => clearInterval(intervalRef.current);
-  }, [round]);
+  }, [round, gameStarted]);
 
   const startRound = (roundNum) => {
     const chosen = shuffleArray(COLOR_IMAGES).slice(0, roundNum + 2);
@@ -92,7 +108,9 @@ export default function PantoneParade() {
         if (prev === 1) {
           clearInterval(intervalRef.current);
           setIsCorrect(false);
+          setShowEndModal(true);
         }
+
         return prev - 1;
       });
     }, 1000);
@@ -105,7 +123,12 @@ export default function PantoneParade() {
     if (updated.length === sequence.length) {
       const correct = updated.every((c, i) => c.name === sequence[i].name);
       clearInterval(intervalRef.current);
-      setIsCorrect(correct);
+      if (correct) {
+        setIsCorrect(true);
+      } else {
+        setIsCorrect(false);
+        setShowEndModal(true);
+      }
     }
   };
 
@@ -121,12 +144,8 @@ export default function PantoneParade() {
       setRound(round + 1);
     } else {
       setIsCorrect("win");
+      setShowEndModal(true);
     }
-  };
-
-  const handleReset = () => {
-    setRound(1);
-    startRound(1);
   };
 
   const renderColorGrid = () => (
@@ -148,68 +167,107 @@ export default function PantoneParade() {
     </TouchableOpacity>
   );
 
+  const handleBackToMap = () => {
+    if (isCorrect === "win") {
+      onWin();
+    } else {
+      onFail();
+    }
+    router.back();
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Pantone Parade</Text>
-      <Text style={styles.subtitle}>Round {round} of 3</Text>
-      <Text style={styles.timerText}>
-        {revealed
-          ? `Memorize: ${viewTimer}s`
-          : isCorrect === null
-          ? `Time Left: ${playTimer}s`
-          : null}
-      </Text>
+    <>
+      <GamePopupModal
+        visible={showIntro}
+        imageSrc={require("../assets/images/shopowners/happyboutique.png")}
+        message={"Welcome to Color Match! I’m the boutique’s stylist fish 💅"}
+        onClose={() => {
+          setShowIntro(false);
+          setShowRules(true);
+        }}
+        buttonText="Let's go!"
+      />
 
-      <View style={styles.grid}>
-        {(revealed ? sequence : selected).map((c, i) => (
-          <View key={i} style={styles.imageWrapper}>
-            <Image
-              source={c.source}
-              style={styles.smallImageBlock}
-              resizeMode="contain"
-            />
-            <Text style={styles.numberLabel}>{i + 1}.</Text>
-          </View>
-        ))}
-      </View>
+      <GamePopupModal
+        visible={showRules}
+        imageSrc={require("../assets/images/shopowners/happyboutique.png")}
+        message={
+          "Memorize the color lineup, then recreate it in the right order. Complete 3 rounds to win!"
+        }
+        onClose={() => {
+          setShowRules(false);
+          setGameStarted(true);
+        }}
+        buttonText="Start Game"
+      />
 
-      {!revealed && isCorrect === null && (
-        <>
-          {renderColorGrid()}
-          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-            <Text style={styles.deleteText}>Delete Color</Text>
-          </TouchableOpacity>
-        </>
-      )}
+      <GamePopupModal
+        visible={showEndModal}
+        imageSrc={
+          isCorrect === "win"
+            ? require("../assets/images/shopowners/happyboutique.png")
+            : require("../assets/images/shopowners/sadboutique.png")
+        }
+        message={
+          isCorrect === "win"
+            ? "💫 Stunning! You've got the style, darling. Collect your token and strut!"
+            : "A fashion faux pas! Try again, darling"
+        }
+        onClose={handleBackToMap}
+        buttonText="Back to Map"
+      />
 
-      {isCorrect === true && (
-        <View>
-          <Text style={styles.resultText}>🎉 Correct!</Text>
-          <TouchableOpacity style={styles.resetButton} onPress={handleNext}>
-            <Text style={styles.resetText}>
-              {round < 3 ? "Next Round" : "See Results"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {isCorrect === false && (
-        <View>
-          <Text style={styles.resultText}>
-            ❌ A fashion faux pas! Try again, darling.
+      {!showIntro && !showRules && (
+        <View style={styles.container}>
+          <Text style={styles.title}>Color Match</Text>
+          <Text style={styles.subtitle}>Round {round} of 3</Text>
+          <Text style={styles.timerText}>
+            {revealed
+              ? `Memorize: ${viewTimer}s`
+              : isCorrect === null
+              ? `Time Left: ${playTimer}s`
+              : null}
           </Text>
-        </View>
-      )}
 
-      {isCorrect === "win" && (
-        <View>
-          <Text style={styles.resultText}>🌟 You completed all rounds!</Text>
-          <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
-            <Text style={styles.resetText}>Play Again</Text>
-          </TouchableOpacity>
+          <View style={styles.grid}>
+            {(revealed ? sequence : selected).map((c, i) => (
+              <View key={i} style={styles.imageWrapper}>
+                <Image
+                  source={c.source}
+                  style={styles.smallImageBlock}
+                  resizeMode="contain"
+                />
+                <Text style={styles.numberLabel}>{i + 1}.</Text>
+              </View>
+            ))}
+          </View>
+
+          {!revealed && isCorrect === null && (
+            <>
+              {renderColorGrid()}
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={handleDelete}
+              >
+                <Text style={styles.deleteText}>Delete Color</Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+          {isCorrect === true && (
+            <View>
+              <Text style={styles.resultText}>🎉 Correct!</Text>
+              <TouchableOpacity style={styles.resetButton} onPress={handleNext}>
+                <Text style={styles.resetText}>
+                  {round < 3 ? "Next Round" : "See Results"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       )}
-    </View>
+    </>
   );
 }
 
@@ -234,20 +292,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 10,
   },
-  row: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginVertical: 5,
-    flexWrap: "wrap",
-    maxWidth: 300,
-  },
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 10,
-    paddingHorizontal: 0,
     maxWidth: 320,
   },
   imageWrapper: {
