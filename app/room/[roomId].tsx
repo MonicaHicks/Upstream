@@ -64,7 +64,7 @@ export default function RoomScreen() {
   if (!room || !currentPlayer) {
     return (
       <View style={styles.center}>
-        <Text>Something went fishy 🐡</Text>
+        <Text>Something went fishy</Text>
       </View>
     );
   }

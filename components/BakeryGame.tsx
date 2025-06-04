@@ -113,6 +113,7 @@ export default function BakeryWordSearch({ onWin, onFail }: Props) {
   const [wordPositions, setWordPositions] = useState<Coord[][]>([]);
   const [showIntro, setShowIntro] = useState(true);
   const [showRules, setShowRules] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
   let [fontsLoaded] = useFonts({
     Cinzel_900Black,
@@ -188,8 +189,15 @@ export default function BakeryWordSearch({ onWin, onFail }: Props) {
       <GamePopupModal
         visible={showRules}
         imageSrc={require("../assets/images/shopowners/happybakery.png")}
-        message={"Find the words"}
+        message={"Help me finalize my menu by finding the words!"}
         onClose={() => setShowRules(false)}
+      />
+
+      <GamePopupModal
+        visible={showHint}
+        imageSrc={require("../assets/images/shopowners/happybakery.png")}
+        message={`Your words are: ${targetWords.join(", ")}`}
+        onClose={() => setShowHint(false)}
       />
 
       {!showIntro && !showRules && (
@@ -226,9 +234,7 @@ export default function BakeryWordSearch({ onWin, onFail }: Props) {
               <Text style={styles.submitText}>Submit Word</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() =>
-                Alert.alert("Hint", "Words: " + targetWords.join(", "))
-              }
+              onPress={() => setShowHint(true)}
               style={styles.hintButton}
             >
               <Text style={styles.hintText}>Hint</Text>

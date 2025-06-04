@@ -224,7 +224,9 @@ export default function HatGame({ onWin, onFail }: Props) {
       <GamePopupModal
         visible={showIntro}
         imageSrc={require("../assets/images/shopowners/happyhat.png")}
-        message={"I am the hat shop fish"}
+        message={
+          "I am the hat shop fish, and I just can't keep up with this never-ending inventory!"
+        }
         onClose={() => {
           setShowIntro(false);
           setShowRules(true);
@@ -242,7 +244,7 @@ export default function HatGame({ onWin, onFail }: Props) {
 
       {!showIntro && !showRules && (
         <View style={styles.container}>
-          <Text style={styles.score}>🎩 Score: {score}</Text>
+          <Text style={styles.score}>Score: {score}</Text>
           <View style={styles.grid}>
             {grid.map((row, r) =>
               row.map((hatIndex, c) => (

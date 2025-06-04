@@ -14,7 +14,7 @@ import GamePopupModal from "./GamePopUpModal";
 
 const CELL_SIZE = 20;
 const GRID_SIZE = 15;
-const GAME_TICK_MS = 200;
+const GAME_TICK_MS = 400;
 const INITIAL_SNAKE = [
   { x: 2, y: GRID_SIZE - 2 },
   { x: 1, y: GRID_SIZE - 2 },

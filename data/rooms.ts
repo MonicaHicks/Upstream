@@ -9,8 +9,8 @@ export const rooms: Room[] = [
     color: "#fff",
     unlocked: true,
     image: require("@/assets/images/openUpShop.png"),
-    happyfish: "",
-    sadfish: "",
+    happyfish: require("@/assets/images/shopowners/happystevie.png"),
+    sadfish: require("@/assets/images/shopowners/sadstevie.png"),
   },
   {
     id: "tarot",

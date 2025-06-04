@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
+import GamePopupModal from "./GamePopUpModal";
 type Option = {
   region: string;
   image: any;
@@ -74,6 +74,8 @@ export default function SouvenirGame({ onWin, onFail }: Props) {
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
+  const [showRules, setShowRules] = useState(false);
 
   useEffect(() => {
     const copy = [...postcards];
@@ -118,15 +120,6 @@ export default function SouvenirGame({ onWin, onFail }: Props) {
     }
   };
 
-  const handleSkip = () => {
-    if (index + 1 === postcards.length) {
-      setFinished(true);
-      if (score < 3) onFail();
-    } else {
-      setIndex((i) => i + 1);
-    }
-  };
-
   if (finished) {
     return (
       <View style={styles.container}>
@@ -142,26 +135,45 @@ export default function SouvenirGame({ onWin, onFail }: Props) {
 
   if (!current) return <></>;
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Where is this postcard from?</Text>
-      <Image source={current.image} style={styles.postcard} />
+    <>
+      <GamePopupModal
+        visible={showIntro}
+        imageSrc={require("../assets/images/shopowners/happysouvenir.png")}
+        message={
+          "I am the souvenir shop fish, and my postcard display is a mess!"
+        }
+        onClose={() => {
+          setShowIntro(false);
+          setShowRules(true);
+        }}
+      />
 
-      <View style={styles.optionRow}>
-        {options.map((option) => (
-          <TouchableOpacity
-            key={option.region}
-            onPress={() => handleGuess(option.region)}
-            style={styles.smallSilhouetteBox}
-          >
-            <Image source={option.image} style={styles.smallSilhouette} />
-          </TouchableOpacity>
-        ))}
-      </View>
+      <GamePopupModal
+        visible={showRules}
+        imageSrc={require("../assets/images/shopowners/happysouvenir.png")}
+        message={"Help me put my postcards back where they belong!"}
+        onClose={() => setShowRules(false)}
+      />
 
-      <TouchableOpacity onPress={handleSkip} style={styles.skip}>
-        <Text style={styles.skipText}>Skip ➤</Text>
-      </TouchableOpacity>
-    </View>
+      {!showIntro && !showRules && (
+        <View style={styles.container}>
+          <Text style={styles.title}>Where is this postcard from?</Text>
+          <Image source={current.image} style={styles.postcard} />
+
+          <View style={styles.optionRow}>
+            {options.map((option) => (
+              <TouchableOpacity
+                key={option.region}
+                onPress={() => handleGuess(option.region)}
+                style={styles.smallSilhouetteBox}
+              >
+                <Image source={option.image} style={styles.smallSilhouette} />
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      )}
+    </>
   );
 }
 
@@ -213,16 +225,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     resizeMode: "contain",
-  },
-  skip: {
-    marginTop: 16,
-    backgroundColor: "#eee",
-    padding: 10,
-    borderRadius: 20,
-  },
-  skipText: {
-    fontSize: 14,
-    color: "#444",
   },
   optionRow: {
     flexDirection: "row",

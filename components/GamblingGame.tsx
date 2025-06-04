@@ -56,25 +56,31 @@ export default function GamblingGame({ onWin, onFail }: Props) {
   };
 
   const handleRoll = () => {
-    if (rollCount >= 5 || rolling) return;
+    if (rollCount >= 5 || rolling || result) return;
+
     setRolling(true);
     const rolled = rollDie();
     animateRoll();
+
     setTimeout(() => {
+      const updatedRolls = [...rolls, rolled];
       setCurrentRoll(rolled);
-      setRolls((prev) => [...prev, rolled]);
+      setRolls(updatedRolls);
       setRollCount((prev) => prev + 1);
       setRolling(false);
 
-      if (rollCount + 1 === 5 && choice && target !== null) {
-        const successCount = [...rolls, rolled].filter((r) =>
+      if (choice && target !== null) {
+        const successCount = updatedRolls.filter((r) =>
           choice === "high" ? r > target : r < target
         ).length;
+
+        const remainingRolls = 5 - updatedRolls.length;
+        const possibleMaxSuccess = successCount + remainingRolls;
 
         if (successCount >= 3) {
           setResult("win");
           onWin();
-        } else {
+        } else if (possibleMaxSuccess < 3) {
           setResult("lose");
           onFail();
         }
