@@ -10,12 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-<<<<<<< HEAD
-import arrow from "../assets/images/kelpass/arrow.png";
-import sun from "../assets/images/kelpass/sun.png";
 import GamePopupModal from "./GamePopUpModal";
-=======
->>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
 
 const CELL_SIZE = 20;
 const GRID_SIZE = 15;
@@ -44,12 +39,8 @@ type Props = {
   onFail: () => void;
 };
 
-<<<<<<< HEAD
-export default function KelpSnake({ onWin }: Props) {
-  const router = useRouter();
-=======
 export default function KelpSnake({ onWin, onFail }: Props) {
->>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
+  const router = useRouter();
   const [snake, setSnake] = useState(INITIAL_SNAKE);
   const [direction, setDirection] = useState(INITIAL_DIRECTION);
   const [food, setFood] = useState(getRandomFood(INITIAL_SNAKE));
@@ -87,14 +78,15 @@ export default function KelpSnake({ onWin, onFail }: Props) {
   }, []);
 
   useEffect(() => {
-<<<<<<< HEAD
-    if (step !== "game" || gameOver || hasWon) return;
-=======
-    if (gameOver) {
-      onFail();
+    if (step !== "game") {
+      if (hasWon) {
+        onWin();
+      }
+      if (gameOver) {
+        onFail();
+      }
       return;
     }
->>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
 
     const interval = setInterval(() => {
       setSnake((prev) => {

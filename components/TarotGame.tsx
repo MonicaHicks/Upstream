@@ -147,7 +147,7 @@ export default function TarotGame({ onWin, onFail }: Props) {
           {renderRows()}
           <Text style={styles.feedback}>{feedback}</Text>
         </ScrollView>
-      )}{" "}
+      )}
     </>
   );
 }

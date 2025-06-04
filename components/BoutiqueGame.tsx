@@ -1,27 +1,7 @@
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-<<<<<<< HEAD
 import GamePopupModal from "./GamePopUpModal";
-
-import color1 from "../assets/images/colors/color1.png";
-import color10 from "../assets/images/colors/color10.png";
-import color11 from "../assets/images/colors/color11.png";
-import color12 from "../assets/images/colors/color12.png";
-import color13 from "../assets/images/colors/color13.png";
-import color14 from "../assets/images/colors/color14.png";
-import color15 from "../assets/images/colors/color15.png";
-import color16 from "../assets/images/colors/color16.png";
-import color2 from "../assets/images/colors/color2.png";
-import color3 from "../assets/images/colors/color3.png";
-import color4 from "../assets/images/colors/color4.png";
-import color5 from "../assets/images/colors/color5.png";
-import color6 from "../assets/images/colors/color6.png";
-import color7 from "../assets/images/colors/color7.png";
-import color8 from "../assets/images/colors/color8.png";
-import color9 from "../assets/images/colors/color9.png";
-=======
->>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
 
 const COLOR_IMAGES = [
   { name: "color1", source: require("../assets/images/colors/color1.png") },
@@ -51,25 +31,14 @@ function shuffleArray<T>(array: T[]): T[] {
   return copy;
 }
 
-<<<<<<< HEAD
-=======
-interface ColorItem {
-  name: string;
-  source: any;
-}
-
->>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
 type Props = {
   onWin: () => void;
   onFail: () => void;
 };
 
 export default function PantoneParade({ onWin, onFail }: Props) {
-<<<<<<< HEAD
   const router = useRouter();
 
-=======
->>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
   const [round, setRound] = useState(1);
   const [sequence, setSequence] = useState<ColorItem[]>([]);
   const [shuffled, setShuffled] = useState<ColorItem[]>([]);
@@ -80,7 +49,6 @@ export default function PantoneParade({ onWin, onFail }: Props) {
   const [playTime] = useState(15);
   const [viewTimer, setViewTimer] = useState(5);
   const [playTimer, setPlayTimer] = useState(15);
-<<<<<<< HEAD
   const intervalRef = useRef(null);
   const [showIntro, setShowIntro] = useState(true);
   const [showRules, setShowRules] = useState(false);
@@ -93,16 +61,6 @@ export default function PantoneParade({ onWin, onFail }: Props) {
     }
     return () => clearInterval(intervalRef.current);
   }, [round, gameStarted]);
-=======
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    startRound(round);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [round]);
->>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
 
   const startRound = (roundNum: number) => {
     const chosen = shuffleArray(COLOR_IMAGES).slice(0, roundNum + 2);
@@ -147,7 +105,6 @@ export default function PantoneParade({ onWin, onFail }: Props) {
     setSelected(updated);
     if (updated.length === sequence.length) {
       const correct = updated.every((c, i) => c.name === sequence[i].name);
-<<<<<<< HEAD
       clearInterval(intervalRef.current);
       if (correct) {
         setIsCorrect(true);
@@ -155,10 +112,6 @@ export default function PantoneParade({ onWin, onFail }: Props) {
         setIsCorrect(false);
         setShowEndModal(true);
       }
-=======
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      setIsCorrect(correct);
->>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
     }
   };
 
@@ -178,20 +131,11 @@ export default function PantoneParade({ onWin, onFail }: Props) {
     }
   };
 
-<<<<<<< HEAD
   const renderColorGrid = () => (
     <View style={styles.grid}>{shuffled.map((c) => renderBlock(c))}</View>
   );
 
   const renderBlock = (item) => (
-=======
-  const handleReset = () => {
-    setRound(1);
-    startRound(1);
-  };
-
-  const renderBlock = (item: ColorItem) => (
->>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
     <TouchableOpacity
       key={item.name}
       style={styles.imageWrapper}
@@ -206,7 +150,6 @@ export default function PantoneParade({ onWin, onFail }: Props) {
     </TouchableOpacity>
   );
 
-<<<<<<< HEAD
   const handleBackToMap = () => {
     if (isCorrect === "win") {
       onWin();
@@ -215,11 +158,6 @@ export default function PantoneParade({ onWin, onFail }: Props) {
     }
     router.back();
   };
-=======
-  const renderColorGrid = () => (
-    <View style={styles.grid}>{shuffled.map((c) => renderBlock(c))}</View>
-  );
->>>>>>> 566bef84a0167e04f987f42dce99ac9ce4932a3b
 
   return (
     <>
