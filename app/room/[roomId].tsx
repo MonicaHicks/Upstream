@@ -10,6 +10,7 @@ import HatGame from "@/components/HatGame";
 import KelpSnake from "@/components/KelpSnake";
 import MuseumGame from "@/components/MuseumGame";
 import OpenUpShop from "@/components/OpenUpShop";
+import PlayChoiceModal from "@/components/PlayChoiceModal";
 import SouvenirGame from "@/components/SouvenirGame";
 import TarotGame from "@/components/TarotGame";
 import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
@@ -60,6 +61,7 @@ export default function RoomScreen() {
   const [chosenMode, setChosenMode] = useState<"riddle" | "game" | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [won, setWon] = useState<boolean | null>(null);
+  const [showChoiceModal, setShowChoiceModal] = useState(false);
 
   if (!room || !currentPlayer) {
     return (
@@ -124,7 +126,8 @@ export default function RoomScreen() {
     } else if (hasMiniGame && (!hasRiddle || attempts < 2)) {
       setChosenMode("game");
     } else if (hasMiniGame && hasRiddle && attempts >= 2) {
-      setChosenMode("riddle");
+      //setChosenMode("riddle");
+      setShowChoiceModal(true);
     }
     if (riddles && riddles.length > 0) {
       const index = Math.floor(Math.random() * riddles.length);
@@ -316,6 +319,20 @@ export default function RoomScreen() {
             </Modal>
           )}
 
+          <PlayChoiceModal
+            visible={showChoiceModal}
+            imageSrc={room.happyfish}
+            message={"Looks like you're having a hard time"}
+            onClose={(choice) => {
+              setShowChoiceModal(false);
+              if (choice === "riddle") {
+                setChosenMode("riddle");
+              } else {
+                setChosenMode("game");
+              }
+            }}
+          />
+
           <TouchableOpacity
             onPress={() => router.back()}
             style={[styles.button, { marginTop: 12, backgroundColor: "#888" }]}
@@ -405,5 +422,27 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     width: "80%",
     alignItems: "center",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.6)",
+    padding: 20,
+  },
+  modalText: {
+    color: "white",
+    fontSize: 18,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  modalButton: {
+    backgroundColor: "blue",
+    borderRadius: 15,
+    height: 40,
+    textAlign: "center",
+    justifyContent: "center",
+    gap: 10,
+    margin: 10,
   },
 });
