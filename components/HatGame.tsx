@@ -225,7 +225,7 @@ export default function HatGame({ onWin, onFail }: Props) {
         visible={showIntro}
         imageSrc={require("../assets/images/shopowners/happyhat.png")}
         message={
-          "I am the hat shop fish, and I just can't keep up with this never-ending inventory!"
+          "Welcome to my hat shop!\n\nWhen life just keeps comin' at ya, you've gotta learn to keep up with it.\n\nShow me you can handle the pressure without blowing your lid."
         }
         onClose={() => {
           setShowIntro(false);
@@ -237,7 +237,7 @@ export default function HatGame({ onWin, onFail }: Props) {
         visible={showRules}
         imageSrc={require("../assets/images/shopowners/happyhat.png")}
         message={
-          "Match three hats in a row to make them disappear!\n\nGet 25 points to win."
+          "Let's see if you can keep up with this never-ending inventory!\n\nMatch three hats in a row to make them disappear!\n\nGet 25 points to win."
         }
         onClose={() => setShowRules(false)}
       />

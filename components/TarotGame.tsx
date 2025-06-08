@@ -129,7 +129,9 @@ export default function TarotGame({ onWin, onFail }: Props) {
       <GamePopupModal
         visible={showIntro}
         imageSrc={require("../assets/images/shopowners/happytarot.png")}
-        message={"I am the tarot card fish"}
+        message={
+          "Welcome to my tarot shop!\n\nBeing a shop owner isn't for everybody.\n\nLet's ask the cards what your future holds!"
+        }
         onClose={() => {
           setShowIntro(false);
           setShowRules(true);
@@ -138,7 +140,9 @@ export default function TarotGame({ onWin, onFail }: Props) {
       <GamePopupModal
         visible={showRules}
         imageSrc={require("../assets/images/shopowners/happytarot.png")}
-        message={"Find three pairs to reveal your destiny!"}
+        message={
+          "Find three pairs to reveal your past, present, and future!\n\nFailing to make three matches would be...a very bad omen.\n\nShow me you have what it takes!"
+        }
         onClose={() => setShowRules(false)}
       />
       {!showIntro && !showRules && (
@@ -182,5 +186,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 12,
     textAlign: "center",
+    fontFamily: "Cinzel_900Black",
   },
 });

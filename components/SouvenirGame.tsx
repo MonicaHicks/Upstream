@@ -140,7 +140,7 @@ export default function SouvenirGame({ onWin, onFail }: Props) {
         visible={showIntro}
         imageSrc={require("../assets/images/shopowners/happysouvenir.png")}
         message={
-          "I am the souvenir shop fish, and my postcard display is a mess!"
+          "Welcome to the souvenir shop!\n\nThis is a big world, and you've got to learn to think outside the bowl!\n\nShow me you've got the worldly wisdom to open your own shop."
         }
         onClose={() => {
           setShowIntro(false);
@@ -151,7 +151,9 @@ export default function SouvenirGame({ onWin, onFail }: Props) {
       <GamePopupModal
         visible={showRules}
         imageSrc={require("../assets/images/shopowners/happysouvenir.png")}
-        message={"Help me put my postcards back where they belong!"}
+        message={
+          "My postcard display is a mess!\n\nHelp me pair postcards with the country they're from.\n\nYou'll need to make at least three matches to convince me you're ready!"
+        }
         onClose={() => setShowRules(false)}
       />
 

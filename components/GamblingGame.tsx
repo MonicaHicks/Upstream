@@ -103,7 +103,9 @@ export default function GamblingGame({ onWin, onFail }: Props) {
       <GamePopupModal
         visible={showIntro}
         imageSrc={require("../assets/images/shopowners/happygamble.png")}
-        message={"I am the gambling den fish"}
+        message={
+          "Welcome to my gambling den!\n\nIn life, you have to know when to hold 'em and when to fold 'em.\n\nBeat this game to show me you have what it takes!"
+        }
         onClose={() => {
           setShowIntro(false);
           setShowRules(true);
@@ -113,7 +115,9 @@ export default function GamblingGame({ onWin, onFail }: Props) {
       <GamePopupModal
         visible={showRules}
         imageSrc={require("../assets/images/shopowners/happygamble.png")}
-        message={"Choose wisely and roll correctly to beat this game"}
+        message={
+          "First you choose high or low, then I roll a number.\n\nYou only have five dice rolls to meet the condition!"
+        }
         onClose={() => setShowRules(false)}
       />
 

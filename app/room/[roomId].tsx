@@ -76,8 +76,10 @@ export default function RoomScreen() {
       markChallengeSolved(room.id);
       setSolved(true);
       setFeedback("Correct!");
+      handleGameWin("You did it!");
     } else {
       setFeedback("Try again.");
+      handleGameFail("Try again.");
     }
   };
 

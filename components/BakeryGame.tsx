@@ -179,7 +179,9 @@ export default function BakeryWordSearch({ onWin, onFail }: Props) {
       <GamePopupModal
         visible={showIntro}
         imageSrc={require("../assets/images/shopowners/happybakery.png")}
-        message={"I am the bakery fish"}
+        message={
+          "Welcome to my bakery!\n\nLife as a shopowner can be hard, but I'll show you to rise above it--no yeast required!"
+        }
         onClose={() => {
           setShowIntro(false);
           setShowRules(true);
@@ -189,7 +191,9 @@ export default function BakeryWordSearch({ onWin, onFail }: Props) {
       <GamePopupModal
         visible={showRules}
         imageSrc={require("../assets/images/shopowners/happybakery.png")}
-        message={"Help me finalize my menu by finding the words!"}
+        message={
+          "My shop is about to open, and I don't have a menu up yet!\n\nFind the menu items hidden in the letters--quick! You only have one minute!"
+        }
         onClose={() => setShowRules(false)}
       />
 
