@@ -1,10 +1,12 @@
+import GamePopupModal from "@/components/GamePopUpModal";
 import RoomIcon from "@/components/RoomIcon";
 import { useGame } from "@/context/GameContext";
 import { Player, Room } from "@/types/types";
 import { Cinzel_900Black } from "@expo-google-fonts/cinzel/900Black";
 import { useFonts } from "@expo-google-fonts/cinzel/useFonts";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ImageBackground,
   Modal,
@@ -21,6 +23,20 @@ export default function HomeScreen() {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [showModal, setShowModal] = useState(false);
   const router = useRouter();
+  const [intro1, setIntro1] = useState(false);
+  const [intro2, setIntro2] = useState(false);
+
+  useEffect(() => {
+    const checkFirstLaunch = async () => {
+      const hasSeenIntro = await AsyncStorage.getItem("hasSeenIntro");
+      if (!hasSeenIntro) {
+        setIntro1(true);
+        await AsyncStorage.setItem("hasSeenIntro", "true");
+      }
+    };
+
+    checkFirstLaunch();
+  }, []);
 
   let [fontsLoaded] = useFonts({
     Cinzel_900Black,
@@ -63,6 +79,33 @@ export default function HomeScreen() {
       >
         Upstream
       </Text>
+
+      <GamePopupModal
+        visible={intro1}
+        onClose={() => {
+          setIntro1(false);
+          setIntro2(true);
+        }}
+        imageSrc={require("../assets/images/shopowners/happystevie.png")}
+        message={
+          "Welcome to Upstream!\n\nI’ve got an empty storefront in my fish market.\n\nDo you have what it takes to be a business owner?"
+        }
+      />
+
+      <GamePopupModal
+        visible={intro2}
+        onClose={() => {
+          setIntro2(false);
+        }}
+        imageSrc={require("../assets/images/shopowners/happystevie.png")}
+        message={`Come visit me any time at "Open Up Shop" to see your hint or check on your progress.\n\nFirst one to fulfill their apprenticeships gets the keys!`}
+        buttonText={"We're Ready!"}
+      />
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={() => setIntro1(true)}>
+          <Text style={styles.buttonText}>Overview</Text>
+        </TouchableOpacity>
+      </View>
 
       <ScrollView contentContainerStyle={styles.snakeContainer}>
         {rooms.map((item, index) => {
@@ -167,5 +210,21 @@ const styles = StyleSheet.create({
   snakeRow: {
     flexDirection: "row",
     marginBottom: 0,
+  },
+  buttonContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  button: {
+    backgroundColor: "#0099cc",
+    padding: 10,
+    borderRadius: 6,
+    width: "25%",
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontFamily: "Cinzel_900Black",
+    textAlign: "center",
   },
 });

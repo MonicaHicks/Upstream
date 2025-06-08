@@ -123,7 +123,7 @@ export default function SouvenirGame({ onWin, onFail }: Props) {
   if (finished) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>📬 Game Over</Text>
+        <Text style={styles.title}>Game Over</Text>
         <Text style={styles.subtitle}>
           You matched {score} out of {postcards.length} correctly.
         </Text>

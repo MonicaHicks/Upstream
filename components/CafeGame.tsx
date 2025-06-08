@@ -71,6 +71,7 @@ export default function CafeGame({ onWin, onFail }: Props) {
   const [totalBeans, setTotalBeans] = useState<number | null>(null);
   const [showIntro, setShowIntro] = useState(true);
   const [showRules, setShowRules] = useState(false);
+  const [dropsLeft, setDropLeft] = useState(TOTAL_DROPS);
 
   useEffect(() => {
     const total = getRandomTotalBeans();
@@ -83,9 +84,7 @@ export default function CafeGame({ onWin, onFail }: Props) {
   const dropNextBean = () => {
     if (drops + 1 >= TOTAL_DROPS) {
       const allEqual = jars.every((val) => val === jars[0]);
-      setFeedback(
-        allEqual ? "Perfectly balanced! ☕️" : "Uneven jars! Try again."
-      );
+      setFeedback(allEqual ? "Perfectly balanced!" : "Uneven jars! Try again.");
       setTimeout(() => (allEqual ? onWin() : onFail()), 1200);
       return;
     }
@@ -94,7 +93,11 @@ export default function CafeGame({ onWin, onFail }: Props) {
   };
 
   const handlePlace = (index: number) => {
-    if (currentBean === null) return;
+    setDropLeft(dropsLeft - 1);
+    if (currentBean === null) {
+      console.log("null bean");
+      return;
+    }
     const newJars = [...jars];
     newJars[index] += currentBean;
     setJars(newJars);
@@ -119,7 +122,9 @@ export default function CafeGame({ onWin, onFail }: Props) {
       <GamePopupModal
         visible={showIntro}
         imageSrc={require("../assets/images/shopowners/happycafe.png")}
-        message={"I am the cafe fish, and my back counter is a mess!"}
+        message={
+          "Welcome to my cafe!\n\nBeing a shopowner requires planning and organization.\n\nIf you're not thinking ahead, you're falling behind."
+        }
         onClose={() => {
           setShowIntro(false);
           setShowRules(true);
@@ -129,7 +134,7 @@ export default function CafeGame({ onWin, onFail }: Props) {
         visible={showRules}
         imageSrc={require("../assets/images/shopowners/happycafe.png")}
         message={
-          "Can you help me clean up these spilled beans and distribute them evenly across my jars?"
+          "Click on a jar to deposit the group of beans into it.\n\nAfter 9 drops, the jars must be completely even.\n\nLet's see what you've got!"
         }
         onClose={() => setShowRules(false)}
       />
@@ -138,7 +143,12 @@ export default function CafeGame({ onWin, onFail }: Props) {
           <Text style={styles.title}>Distribute the coffee beans evenly!</Text>
           <View style={styles.jarsRow}>
             {jars.map((count, index) => (
-              <TouchableOpacity key={index} onPress={() => handlePlace(index)}>
+              <TouchableOpacity
+                key={index}
+                onPress={() => {
+                  handlePlace(index);
+                }}
+              >
                 <Image source={JAR_IMAGES[index]} style={styles.jarImage} />
                 <Text style={styles.beanCountText}>{count} beans</Text>
               </TouchableOpacity>
@@ -154,6 +164,9 @@ export default function CafeGame({ onWin, onFail }: Props) {
               </View>
             </View>
           )}
+          <View style={{ marginTop: 10 }}>
+            <Text style={styles.beanLabel}>{dropsLeft} Drops Left</Text>
+          </View>
           {feedback && <Text style={styles.feedback}>{feedback}</Text>}
         </View>
       )}
